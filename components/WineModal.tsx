@@ -26,9 +26,13 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     async function handleShare() {
         const token = await generateShareToken(wine.id);
         const url = `${window.location.origin}/share/${token}`;
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (navigator.share) {
+            await navigator.share({ title: wine.name, url });
+        } else {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     }
     return (
         <>
