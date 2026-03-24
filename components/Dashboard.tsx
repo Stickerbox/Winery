@@ -85,14 +85,6 @@ export function Dashboard({ wines, user }: DashboardProps) {
                         >
                             {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
                         </Button>
-                        <Button
-                            onClick={() => setIsAddOpen(true)}
-                            size="sm"
-                            className="rounded-full"
-                        >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Wine
-                        </Button>
                         <form action={logout}>
                             <Button variant="ghost" size="icon" className="rounded-full" title="Logout">
                                 <LogOut className="h-4 w-4" />
@@ -161,6 +153,15 @@ export function Dashboard({ wines, user }: DashboardProps) {
                     </>
                 )}
             </AnimatePresence>
+
+            {/* Floating Add Button */}
+            <button
+                onClick={() => setIsAddOpen(true)}
+                className="fixed bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
+                title="Add Wine"
+            >
+                <Plus className="h-6 w-6" />
+            </button>
 
             {/* Wine Details Modal */}
             <AnimatePresence>
