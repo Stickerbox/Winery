@@ -11,6 +11,7 @@ import imageCompression from "browser-image-compression";
 import { addWine, analyzeWineImage } from "@/app/actions";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/LanguageContext";
 
 type Phase = "capture" | "analyzing" | "review";
 
@@ -23,6 +24,7 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
     const [description, setDescription] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
+    const { t } = useTranslations();
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -59,7 +61,7 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
 
     const handleSubmit = async (formData: FormData) => {
         if (rating === 0) {
-            alert("Please select a rating");
+            alert(t.wineForm.ratingRequired);
             return;
         }
         formData.set("rating", rating.toString());
@@ -77,7 +79,7 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                 onSuccess?.();
             } catch (error) {
                 console.error(error);
-                alert("Failed to add wine");
+                alert(t.wineForm.saveFailed);
             }
         });
     };
@@ -86,7 +88,6 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
         <Card className="w-full max-w-sm mx-auto overflow-hidden border-0 shadow-lg ring-1 ring-zinc-200 dark:ring-zinc-800">
             <CardContent className="p-4">
                 <form action={handleSubmit} className="space-y-4">
-                    {/* Image area — large in capture, compact in review */}
                     <motion.div
                         animate={{ height: phase === "capture" ? 240 : 144 }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -106,14 +107,14 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                 {phase === "analyzing" && (
                                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3">
                                         <div className="h-7 w-7 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                        <p className="text-white text-sm font-medium tracking-wide">Identifying wine...</p>
+                                        <p className="text-white text-sm font-medium tracking-wide">{t.wineForm.analyzing}</p>
                                     </div>
                                 )}
                             </>
                         ) : (
                             <div className="flex flex-col items-center gap-3 text-zinc-400">
                                 <Camera className="h-12 w-12" />
-                                <span className="text-sm font-medium">Take a photo of your wine</span>
+                                <span className="text-sm font-medium">{t.wineForm.takePhoto}</span>
                             </div>
                         )}
                         <input
@@ -128,7 +129,6 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                         />
                     </motion.div>
 
-                    {/* Fields — animate in after analysis */}
                     <AnimatePresence>
                         {phase === "review" && (
                             <motion.div
@@ -139,10 +139,10 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                 className="space-y-3"
                             >
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium leading-none">Name</label>
+                                    <label className="text-sm font-medium leading-none">{t.wineForm.nameLabel}</label>
                                     <Input
                                         name="name"
-                                        placeholder="e.g. Château Margaux"
+                                        placeholder={t.wineForm.namePlaceholder}
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         required
@@ -150,10 +150,10 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium leading-none">Description</label>
+                                    <label className="text-sm font-medium leading-none">{t.wineForm.descriptionLabel}</label>
                                     <Textarea
                                         name="description"
-                                        placeholder="Tasting notes, vintage, etc."
+                                        placeholder={t.wineForm.descriptionPlaceholder}
                                         className="min-h-[60px]"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
@@ -162,14 +162,14 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium leading-none">Rating</label>
+                                    <label className="text-sm font-medium leading-none">{t.wineForm.ratingLabel}</label>
                                     <div className="flex justify-center py-1">
                                         <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
                                     </div>
                                 </div>
 
                                 <Button type="submit" className="w-full" disabled={isPending || rating === 0}>
-                                    {isPending ? "Adding Wine..." : "Save to Collection"}
+                                    {isPending ? t.wineForm.saving : t.wineForm.save}
                                 </Button>
                             </motion.div>
                         )}
