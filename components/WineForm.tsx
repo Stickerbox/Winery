@@ -47,8 +47,8 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                 const result = await analyzeWineImage(fd);
                 setName(result.name);
                 setDescription(result.description);
-            } catch {
-                // Analysis failed silently — user can fill in manually
+            } catch (err) {
+                console.error("Wine analysis failed:", err);
             } finally {
                 setAnalyzing(false);
             }
