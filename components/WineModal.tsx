@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar, Trash2, Share2, Check } from "lucide-react";
+import { X, Calendar, Trash2, Share2, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion } from "framer-motion";
@@ -17,7 +17,8 @@ interface WineModalProps {
 
 export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
-    const { t } = useTranslations();
+    const { t, lang } = useTranslations();
+    const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
     async function handleDelete() {
         await deleteWine(wine.id);
@@ -81,6 +82,16 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                     <Calendar className="h-4 w-4 mr-1" />
                                     {new Date(wine.createdAt).toLocaleDateString()}
                                 </div>
+                                <a
+                                    href={saqUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 mt-1 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Go to SAQ
+                                </a>
                             </div>
                             <Button
                                 size="icon"

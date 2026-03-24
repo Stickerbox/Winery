@@ -1,0 +1,68 @@
+<h2>Where should the language toggle live?</h2>
+<p class="subtitle">The toggle switches between English 🇬🇧 and French 🇫🇷. Pick the placement that feels most natural.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-nav" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:13px;">
+        <span style="font-weight:700;color:#7c3aed;">VinoVault</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="background:#f4f4f5;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;">EN / FR</span>
+          <span style="background:#f4f4f5;border-radius:8px;padding:4px 8px;font-size:12px;">Sort ▾</span>
+          <span style="font-size:16px;">🔍</span>
+          <span style="font-size:16px;">↩</span>
+        </div>
+      </div>
+      <div class="mock-content" style="height:80px;background:#fafafa;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">wine grid…</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Header (next to sort)</h3>
+      <p>Always visible, consistent with other header controls. Feels like a global app setting.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-nav" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:13px;">
+        <span style="font-weight:700;color:#7c3aed;">VinoVault</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="background:#f4f4f5;border-radius:8px;padding:4px 8px;font-size:12px;">Sort ▾</span>
+          <span style="font-size:16px;">🔍</span>
+          <span style="font-size:16px;">↩</span>
+        </div>
+      </div>
+      <div class="mock-content" style="height:80px;background:#fafafa;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">wine grid…</div>
+      <div style="padding:8px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:center;gap:16px;font-size:12px;">
+        <span style="font-weight:600;color:#7c3aed;border-bottom:2px solid #7c3aed;cursor:pointer;">English</span>
+        <span style="color:#aaa;cursor:pointer;">Français</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Footer bar</h3>
+      <p>Tucked at the bottom of the screen. Less prominent; good if you don't want it to clutter the header.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-nav" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:13px;">
+        <span style="font-weight:700;color:#7c3aed;">VinoVault</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="background:#f4f4f5;border-radius:8px;padding:4px 8px;font-size:12px;">Sort ▾</span>
+          <span style="font-size:16px;">🔍</span>
+          <span style="font-size:16px;">↩</span>
+        </div>
+      </div>
+      <div class="mock-content" style="height:80px;background:#fafafa;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">wine grid…</div>
+      <div style="padding:8px 16px;display:flex;justify-content:flex-end;">
+        <span style="font-size:11px;color:#9ca3af;cursor:pointer;">🌐 Français</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Below grid (subtle link)</h3>
+      <p>A small "🌐 Français / English" link below the wine grid. Minimal, set-it-and-forget-it feel.</p>
+    </div>
+  </div>
+
+</div>
