@@ -86,9 +86,19 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                         </div>
 
                         <div className="mb-8">
-                            <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
-                                Rating
-                            </h3>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                    Rating
+                                </h3>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="md:hidden rounded-full text-zinc-500 dark:text-zinc-400"
+                                    onClick={handleShare}
+                                >
+                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
+                                </Button>
+                            </div>
                             <RatingStar rating={wine.rating} readonly className="gap-2 [&_svg]:w-8 [&_svg]:h-8" />
                         </div>
 
@@ -112,7 +122,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                             </Button>
                             <Button
                                 variant="ghost"
-                                className="gap-2 text-zinc-600 dark:text-zinc-400"
+                                className="hidden md:flex gap-2 text-zinc-600 dark:text-zinc-400"
                                 onClick={handleShare}
                             >
                                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
