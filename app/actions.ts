@@ -36,10 +36,13 @@ export async function analyzeWineImage(formData: FormData): Promise<{ name: stri
                 },
                 {
                     type: "text",
-                    text: `Analyze this wine bottle or label photo. Return ONLY a JSON object with exactly these two fields:
+                    text: `Analyze this photo. If it is not a wine bottle or label, or if you cannot identify the wine, return exactly:
+{"name": "", "description": ""}
+
+If you can identify the wine, return ONLY a JSON object with exactly these two fields:
 {
-  "name": "the wine name including producer/winery and vintage year if visible",
-  "description": "2-3 sentences about this wine's typical taste, characteristics, and food pairings"
+  "name": "producer/winery, wine name, and vintage year if visible",
+  "description": "one sentence tasting note covering the key flavours and a food pairing"
 }
 No other text before or after the JSON.`,
                 },
