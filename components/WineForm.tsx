@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import imageCompression from "browser-image-compression";
 import { addWine } from "@/app/actions";
 import { cn } from "@/lib/utils";
 
@@ -16,14 +17,23 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            const compressed = await imageCompression(file, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1200,
+                useWebWorker: true,
+            });
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string);
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(compressed);
+            // Replace the file in the input with the compressed version
+            const dt = new DataTransfer();
+            dt.items.add(new File([compressed], file.name, { type: compressed.type }));
+            e.target.files = dt.files;
         }
     };
 
