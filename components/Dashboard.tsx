@@ -72,7 +72,7 @@ export function Dashboard({ wines, user }: DashboardProps) {
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
                         >
-                            <div className="w-full max-w-md pointer-events-auto relative">
+                            <div className="w-full max-w-sm pointer-events-auto relative max-h-[90vh] overflow-y-auto rounded-2xl">
                                 <Button
                                     size="icon"
                                     variant="ghost"

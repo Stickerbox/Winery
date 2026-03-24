@@ -60,17 +60,17 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
     };
 
     return (
-        <Card className="w-full max-w-md mx-auto overflow-hidden border-0 shadow-lg ring-1 ring-zinc-200 dark:ring-zinc-800">
-            <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 pb-4">
-                <CardTitle className="text-xl text-center">Add New Wine</CardTitle>
+        <Card className="w-full max-w-sm mx-auto overflow-hidden border-0 shadow-lg ring-1 ring-zinc-200 dark:ring-zinc-800">
+            <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 py-3 pb-3">
+                <CardTitle className="text-lg text-center">Add New Wine</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
-                <form action={handleSubmit} className="space-y-6">
+            <CardContent className="p-4 space-y-4">
+                <form action={handleSubmit} className="space-y-4">
                     {/* Image Upload */}
                     <div className="space-y-2">
                         <div
                             className={cn(
-                                "relative aspect-square w-full overflow-hidden rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                                "relative h-36 w-full overflow-hidden rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
                                 imagePreview && "border-solid border-0 p-0"
                             )}
                             onClick={() => fileInputRef.current?.click()}
@@ -106,30 +106,31 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-4">
-                        <div className="space-y-2">
+                    <div className="space-y-3">
+                        <div className="space-y-1">
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Name
                             </label>
                             <Input name="name" placeholder="e.g. Château Margaux" required />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Description
                             </label>
                             <Textarea
                                 name="description"
                                 placeholder="Tasting notes, vintage, etc."
+                                className="min-h-[60px]"
                                 required
                             />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Rating
                             </label>
-                            <div className="flex justify-center py-2">
+                            <div className="flex justify-center py-1">
                                 <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
                             </div>
                         </div>
@@ -138,7 +139,6 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                     <Button
                         type="submit"
                         className="w-full"
-                        size="lg"
                         disabled={isPending}
                     >
                         {isPending ? "Adding Wine..." : "Save to Collection"}
