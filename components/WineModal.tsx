@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion } from "framer-motion";
 import { deleteWine, generateShareToken } from "@/app/actions";
+import { useTranslations } from "@/components/LanguageContext";
 
 interface WineModalProps {
     wine: Wine;
@@ -16,6 +17,7 @@ interface WineModalProps {
 
 export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
+    const { t } = useTranslations();
 
     async function handleDelete() {
         await deleteWine(wine.id);
@@ -38,6 +40,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
             // share/clipboard unavailable
         }
     }
+
     return (
         <>
             <motion.div
@@ -92,7 +95,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                         <div className="mb-8">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                                    Rating
+                                    {t.common.rating}
                                 </h3>
                                 <Button
                                     variant="ghost"
@@ -108,21 +111,21 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
 
                         <div className="flex-1">
                             <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
-                                Tasting Notes
+                                {t.wineModal.tastingNotes}
                             </h3>
                             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
                                 {wine.description}
                             </p>
                         </div>
 
-<div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                             <Button
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
                                 onClick={handleDelete}
                             >
                                 <Trash2 className="h-4 w-4" />
-                                Delete
+                                {t.common.delete}
                             </Button>
                             <Button
                                 variant="ghost"
@@ -130,7 +133,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                 onClick={handleShare}
                             >
                                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
-                                {copied ? "Copied!" : "Share"}
+                                {copied ? t.common.copied : t.common.share}
                             </Button>
                         </div>
                     </div>
