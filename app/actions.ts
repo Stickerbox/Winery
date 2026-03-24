@@ -147,6 +147,7 @@ export async function addSharedWine(token: string) {
         },
     });
 
+    revalidatePath("/");
     redirect("/");
 }
 
