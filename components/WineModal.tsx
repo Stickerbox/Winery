@@ -2,17 +2,24 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar } from "lucide-react";
+import { X, Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion } from "framer-motion";
+import { deleteWine } from "@/app/actions";
 
 interface WineModalProps {
     wine: Wine;
     onClose: () => void;
+    onDelete?: () => void;
 }
 
-export function WineModal({ wine, onClose }: WineModalProps) {
+export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
+    async function handleDelete() {
+        await deleteWine(wine.id);
+        onClose();
+        onDelete?.();
+    }
     return (
         <>
             <motion.div
@@ -78,6 +85,17 @@ export function WineModal({ wine, onClose }: WineModalProps) {
                             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
                                 {wine.description}
                             </p>
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                            <Button
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
+                                onClick={handleDelete}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                Delete Wine
+                            </Button>
                         </div>
                     </div>
                 </motion.div>

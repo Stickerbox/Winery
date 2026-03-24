@@ -53,6 +53,21 @@ export async function addWine(formData: FormData) {
     revalidatePath("/");
 }
 
+export async function deleteWine(id: number) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const wine = await prisma.wine.findUnique({ where: { id } });
+    if (!wine || wine.userId !== user.id) throw new Error("Not found");
+
+    // Delete image file
+    const filePath = path.join(process.cwd(), "public", wine.imagePath);
+    await fs.unlink(filePath).catch(() => {});
+
+    await prisma.wine.delete({ where: { id } });
+    revalidatePath("/");
+}
+
 export async function getWines() {
     const user = await getCurrentUser();
     if (!user) return [];
