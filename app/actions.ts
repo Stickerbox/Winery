@@ -127,8 +127,12 @@ export async function addSharedWine(token: string) {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
 
-    const wine = await prisma.wine.findUnique({ where: { shareToken: token } });
+    const wine = await prisma.wine.findUnique({
+        where: { shareToken: token },
+        include: { user: true },
+    });
     if (!wine) throw new Error("Wine not found");
+    if (!wine.user) throw new Error("Sharer not found");
 
     if (wine.userId === user.id) throw new Error("Already in your collection");
 
@@ -139,6 +143,7 @@ export async function addSharedWine(token: string) {
             rating: wine.rating,
             imagePath: wine.imagePath,
             userId: user.id,
+            sharedByUsername: wine.user.username,
         },
     });
 
