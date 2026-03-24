@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Wine } from "@prisma/client";
 import { WineCard } from "@/components/WineCard";
+import { useTranslations } from "@/components/LanguageContext";
 import { motion } from "framer-motion";
 
 interface WineGridProps {
@@ -11,11 +12,13 @@ interface WineGridProps {
 }
 
 export function WineGrid({ wines, onWineClick }: WineGridProps) {
+    const { t } = useTranslations();
+
     if (wines.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-                <p className="text-lg">No wines added yet.</p>
-                <p className="text-sm">Click the + button to add your first bottle.</p>
+                <p className="text-lg">{t.wineGrid.emptyTitle}</p>
+                <p className="text-sm">{t.wineGrid.emptySubtitle}</p>
             </div>
         );
     }
