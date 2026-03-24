@@ -1,13 +1,18 @@
+import { cookies } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { getCurrentUser } from "@/app/auth-actions";
 import { addSharedWine } from "@/app/actions";
+import { getT } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const prisma = new PrismaClient();
 
 export default async function SharePage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params;
+    const cookieStore = await cookies();
+    const lang = cookieStore.get("lang")?.value ?? "en";
 
     const [wine, user] = await Promise.all([
         prisma.wine.findUnique({
@@ -19,10 +24,11 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
 
     if (!wine) notFound();
 
+    const t = getT(lang);
     const isOwnWine = user?.id === wine.userId;
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 gap-4">
             <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xl ring-1 ring-zinc-200 dark:ring-zinc-800">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                     <img
@@ -33,7 +39,9 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                         <h1 className="font-bold text-xl leading-tight">{wine.name}</h1>
-                        <p className="text-sm text-white/70 mt-0.5">Shared by {wine.user.username}</p>
+                        <p className="text-sm text-white/70 mt-0.5">
+                            {t.share.sharedBy.replace("{username}", wine.user.username)}
+                        </p>
                     </div>
                 </div>
 
@@ -45,7 +53,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                     </p>
 
                     <p className="text-xs text-zinc-400">
-                        Added {new Date(wine.createdAt).toLocaleDateString()}
+                        {t.share.added.replace("{date}", new Date(wine.createdAt).toLocaleDateString())}
                     </p>
                 </div>
 
@@ -55,7 +63,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                             href="/"
                             className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
                         >
-                            View your collection
+                            {t.share.viewCollection}
                         </a>
                     ) : user ? (
                         <form action={addSharedWine.bind(null, token)}>
@@ -63,7 +71,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                                 type="submit"
                                 className="w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
                             >
-                                Add to my wines
+                                {t.share.addToMine}
                             </button>
                         </form>
                     ) : (
@@ -71,11 +79,12 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                             href={`/login?redirect=/share/${token}`}
                             className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
                         >
-                            Log in to add to your wines
+                            {t.share.loginToAdd}
                         </a>
                     )}
                 </div>
             </div>
+            <LanguageToggle />
         </div>
     );
 }
