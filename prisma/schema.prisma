@@ -18,13 +18,14 @@ model User {
 }
 
 model Wine {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  rating      Int
-  imagePath   String
-  createdAt   DateTime @default(now())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  shareToken  String?  @unique
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String
+  rating           Int
+  imagePath        String
+  createdAt        DateTime @default(now())
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id])
+  shareToken       String?  @unique
+  sharedByUsername String?
 }
