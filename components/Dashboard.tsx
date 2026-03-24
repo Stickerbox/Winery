@@ -7,9 +7,11 @@ import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
 import { Button } from "@/components/ui/Button";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/auth-actions";
+import { useTranslations } from "@/components/LanguageContext";
 
 interface DashboardProps {
     wines: Wine[];
@@ -23,6 +25,7 @@ export function Dashboard({ wines, user }: DashboardProps) {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "rating-high" | "rating-low">("newest");
     const searchInputRef = React.useRef<HTMLInputElement>(null);
+    const { t } = useTranslations();
 
     const filteredWines = React.useMemo(() => {
         let result = searchQuery.trim()
@@ -62,7 +65,7 @@ export function Dashboard({ wines, user }: DashboardProps) {
                             VinoVault
                         </h1>
                         <span className="text-sm text-zinc-500 dark:text-zinc-400 hidden sm:inline-block">
-                            Welcome, {user.username}
+                            {t.dashboard.welcome.replace("{username}", user.username)}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -71,22 +74,22 @@ export function Dashboard({ wines, user }: DashboardProps) {
                             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                             className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
                         >
-                            <option value="newest">Newest</option>
-                            <option value="oldest">Oldest</option>
-                            <option value="rating-high">Rating ↓</option>
-                            <option value="rating-low">Rating ↑</option>
+                            <option value="newest">{t.dashboard.sortNewest}</option>
+                            <option value="oldest">{t.dashboard.sortOldest}</option>
+                            <option value="rating-high">{t.dashboard.sortRatingHigh}</option>
+                            <option value="rating-low">{t.dashboard.sortRatingLow}</option>
                         </select>
                         <Button
                             variant="ghost"
                             size="icon"
                             className="rounded-full"
                             onClick={handleSearchToggle}
-                            title="Search"
+                            title={t.dashboard.searchTitle}
                         >
                             {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
                         </Button>
                         <form action={logout}>
-                            <Button variant="ghost" size="icon" className="rounded-full" title="Logout">
+                            <Button variant="ghost" size="icon" className="rounded-full" title={t.dashboard.logoutTitle}>
                                 <LogOut className="h-4 w-4" />
                             </Button>
                         </form>
@@ -106,7 +109,7 @@ export function Dashboard({ wines, user }: DashboardProps) {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search wines..."
+                                placeholder={t.dashboard.searchPlaceholder}
                                 className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
                             />
                         </motion.div>
@@ -119,6 +122,9 @@ export function Dashboard({ wines, user }: DashboardProps) {
                     wines={filteredWines}
                     onWineClick={(wine) => setSelectedWine(wine)}
                 />
+                <div className="flex justify-center pb-6">
+                    <LanguageToggle />
+                </div>
             </main>
 
             {/* Add Wine Modal */}
@@ -158,7 +164,7 @@ export function Dashboard({ wines, user }: DashboardProps) {
             <button
                 onClick={() => setIsAddOpen(true)}
                 className="fixed bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
-                title="Add Wine"
+                title={t.dashboard.addWineTitle}
             >
                 <Plus className="h-6 w-6" />
             </button>
