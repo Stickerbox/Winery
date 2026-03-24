@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "Wine" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "imagePath" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
