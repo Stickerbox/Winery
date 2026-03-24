@@ -82,6 +82,11 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                     <Calendar className="h-4 w-4 mr-1" />
                                     {new Date(wine.createdAt).toLocaleDateString()}
                                 </div>
+                                {wine.sharedByUsername && (
+                                    <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 ring-1 ring-violet-200 dark:ring-violet-700/50">
+                                        {t.share.sharedBy.replace("{username}", wine.sharedByUsername)}
+                                    </span>
+                                )}
                                 <a
                                     href={saqUrl}
                                     target="_blank"
