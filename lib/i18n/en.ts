@@ -1,0 +1,51 @@
+export const en = {
+  common: {
+    delete: "Delete",
+    share: "Share",
+    copied: "Copied!",
+    rating: "Rating",
+  },
+  dashboard: {
+    welcome: "Welcome, {username}",
+    sortNewest: "Newest",
+    sortOldest: "Oldest",
+    sortRatingHigh: "Rating ↓",
+    sortRatingLow: "Rating ↑",
+    searchPlaceholder: "Search wines...",
+    searchTitle: "Search",
+    logoutTitle: "Logout",
+    addWineTitle: "Add Wine",
+  },
+  wineForm: {
+    takePhoto: "Take a photo of your wine",
+    analyzing: "Identifying wine...",
+    nameLabel: "Name",
+    namePlaceholder: "e.g. Château Margaux",
+    descriptionLabel: "Description",
+    descriptionPlaceholder: "Tasting notes, vintage, etc.",
+    ratingLabel: "Rating",
+    saving: "Adding Wine...",
+    save: "Save to Collection",
+    ratingRequired: "Please select a rating",
+    saveFailed: "Failed to add wine",
+  },
+  wineModal: {
+    tastingNotes: "Tasting Notes",
+  },
+  wineGrid: {
+    emptyTitle: "No wines added yet.",
+    emptySubtitle: "Click the + button to add your first bottle.",
+  },
+  login: {
+    description: "Enter your username to access your personal wine collection",
+    usernamePlaceholder: "Username",
+    submit: "Start Collecting",
+  },
+  share: {
+    sharedBy: "Shared by {username}",
+    added: "Added {date}",
+    viewCollection: "View your collection",
+    addToMine: "Add to my wines",
+    loginToAdd: "Log in to add to your wines",
+  },
+} as const;
