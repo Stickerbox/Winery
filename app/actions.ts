@@ -47,9 +47,10 @@ No other text before or after the JSON.`,
         }],
     });
 
-    let text = response.content[0].type === "text" ? response.content[0].text.trim() : "";
-    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-    return JSON.parse(text) as { name: string; description: string };
+    const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON found in Claude response");
+    return JSON.parse(match[0]) as { name: string; description: string };
 }
 
 export async function addWine(formData: FormData) {
