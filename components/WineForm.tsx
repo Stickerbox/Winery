@@ -1,21 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { Camera, Upload, X } from "lucide-react";
+import { Camera } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { RatingStar } from "@/components/ui/RatingStar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import imageCompression from "browser-image-compression";
 import { addWine, analyzeWineImage } from "@/app/actions";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+
+type Phase = "capture" | "analyzing" | "review";
 
 export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
     const [isPending, startTransition] = React.useTransition();
+    const [phase, setPhase] = React.useState<Phase>("capture");
     const [rating, setRating] = React.useState(0);
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
-    const [analyzing, setAnalyzing] = React.useState(false);
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -23,35 +26,34 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const compressed = await imageCompression(file, {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 1200,
-                useWebWorker: true,
-            });
-            compressedFileRef.current = new File([compressed], file.name, { type: compressed.type });
+        if (!file) return;
 
-            const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result as string);
-            reader.readAsDataURL(compressed);
+        const compressed = await imageCompression(file, {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1200,
+            useWebWorker: true,
+        });
+        compressedFileRef.current = new File([compressed], file.name, { type: compressed.type });
 
-            const dt = new DataTransfer();
-            dt.items.add(compressedFileRef.current);
-            e.target.files = dt.files;
+        const reader = new FileReader();
+        reader.onloadend = () => setImagePreview(reader.result as string);
+        reader.readAsDataURL(compressed);
 
-            // Auto-analyze with Claude
-            setAnalyzing(true);
-            try {
-                const fd = new FormData();
-                fd.append("image", compressedFileRef.current);
-                const result = await analyzeWineImage(fd);
-                setName(result.name);
-                setDescription(result.description);
-            } catch (err) {
-                console.error("Wine analysis failed:", err);
-            } finally {
-                setAnalyzing(false);
-            }
+        const dt = new DataTransfer();
+        dt.items.add(compressedFileRef.current);
+        e.target.files = dt.files;
+
+        setPhase("analyzing");
+        try {
+            const fd = new FormData();
+            fd.append("image", compressedFileRef.current);
+            const result = await analyzeWineImage(fd);
+            setName(result.name);
+            setDescription(result.description);
+        } catch (err) {
+            console.error("Wine analysis failed:", err);
+        } finally {
+            setPhase("review");
         }
     };
 
@@ -65,11 +67,11 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
         startTransition(async () => {
             try {
                 await addWine(formData);
-                // Reset form
                 setRating(0);
                 setImagePreview(null);
                 setName("");
                 setDescription("");
+                setPhase("capture");
                 compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
                 onSuccess?.();
@@ -82,101 +84,96 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
 
     return (
         <Card className="w-full max-w-sm mx-auto overflow-hidden border-0 shadow-lg ring-1 ring-zinc-200 dark:ring-zinc-800">
-            <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 py-3 pb-3">
-                <CardTitle className="text-lg text-center">Add New Wine</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4">
                 <form action={handleSubmit} className="space-y-4">
-                    {/* Image Upload */}
-                    <div className="space-y-2">
-                        <div
-                            className={cn(
-                                "relative h-36 w-full overflow-hidden rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
-                                imagePreview && "border-solid border-0 p-0"
-                            )}
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            {imagePreview ? (
-                                <>
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="h-full w-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                        <Camera className="h-8 w-8 text-white" />
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="flex flex-col items-center gap-2 text-zinc-500">
-                                    <Camera className="h-10 w-10" />
-                                    <span className="text-sm font-medium">Take Photo or Upload</span>
-                                </div>
-                            )}
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                name="image"
-                                accept="image/*"
-                                capture="environment"
-                                className="hidden"
-                                onChange={handleImageChange}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Details */}
-                    <div className="space-y-3">
-                        {analyzing && (
-                            <p className="text-xs text-violet-500 text-center animate-pulse">
-                                Identifying wine...
-                            </p>
+                    {/* Image area — large in capture, compact in review */}
+                    <motion.div
+                        animate={{ height: phase === "capture" ? 240 : 144 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className={cn(
+                            "relative w-full overflow-hidden rounded-xl",
+                            !imagePreview && "border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center cursor-pointer"
                         )}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Name
-                            </label>
-                            <Input
-                                name="name"
-                                placeholder="e.g. Château Margaux"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Description
-                            </label>
-                            <Textarea
-                                name="description"
-                                placeholder="Tasting notes, vintage, etc."
-                                className="min-h-[60px]"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Rating
-                            </label>
-                            <div className="flex justify-center py-1">
-                                <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isPending || analyzing}
+                        onClick={() => phase === "capture" && fileInputRef.current?.click()}
                     >
-                        {isPending ? "Adding Wine..." : analyzing ? "Analyzing..." : "Save to Collection"}
-                    </Button>
+                        {imagePreview ? (
+                            <>
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                {phase === "analyzing" && (
+                                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3">
+                                        <div className="h-7 w-7 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                        <p className="text-white text-sm font-medium tracking-wide">Identifying wine...</p>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center gap-3 text-zinc-400">
+                                <Camera className="h-12 w-12" />
+                                <span className="text-sm font-medium">Take a photo of your wine</span>
+                            </div>
+                        )}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            capture="environment"
+                            className="hidden"
+                            onChange={handleImageChange}
+                            required
+                        />
+                    </motion.div>
+
+                    {/* Fields — animate in after analysis */}
+                    <AnimatePresence>
+                        {phase === "review" && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
+                                className="space-y-3"
+                            >
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium leading-none">Name</label>
+                                    <Input
+                                        name="name"
+                                        placeholder="e.g. Château Margaux"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium leading-none">Description</label>
+                                    <Textarea
+                                        name="description"
+                                        placeholder="Tasting notes, vintage, etc."
+                                        className="min-h-[60px]"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium leading-none">Rating</label>
+                                    <div className="flex justify-center py-1">
+                                        <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
+                                    </div>
+                                </div>
+
+                                <Button type="submit" className="w-full" disabled={isPending}>
+                                    {isPending ? "Adding Wine..." : "Save to Collection"}
+                                </Button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </form>
             </CardContent>
         </Card>
