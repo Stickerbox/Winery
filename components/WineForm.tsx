@@ -8,14 +8,18 @@ import { Textarea } from "@/components/ui/Textarea";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import imageCompression from "browser-image-compression";
-import { addWine } from "@/app/actions";
+import { addWine, analyzeWineImage } from "@/app/actions";
 import { cn } from "@/lib/utils";
 
 export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
     const [isPending, startTransition] = React.useTransition();
     const [rating, setRating] = React.useState(0);
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+    const [analyzing, setAnalyzing] = React.useState(false);
+    const [name, setName] = React.useState("");
+    const [description, setDescription] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const compressedFileRef = React.useRef<File | null>(null);
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -25,15 +29,29 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                 maxWidthOrHeight: 1200,
                 useWebWorker: true,
             });
+            compressedFileRef.current = new File([compressed], file.name, { type: compressed.type });
+
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
+            reader.onloadend = () => setImagePreview(reader.result as string);
             reader.readAsDataURL(compressed);
-            // Replace the file in the input with the compressed version
+
             const dt = new DataTransfer();
-            dt.items.add(new File([compressed], file.name, { type: compressed.type }));
+            dt.items.add(compressedFileRef.current);
             e.target.files = dt.files;
+
+            // Auto-analyze with Claude
+            setAnalyzing(true);
+            try {
+                const fd = new FormData();
+                fd.append("image", compressedFileRef.current);
+                const result = await analyzeWineImage(fd);
+                setName(result.name);
+                setDescription(result.description);
+            } catch {
+                // Analysis failed silently — user can fill in manually
+            } finally {
+                setAnalyzing(false);
+            }
         }
     };
 
@@ -50,6 +68,9 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                 // Reset form
                 setRating(0);
                 setImagePreview(null);
+                setName("");
+                setDescription("");
+                compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
                 onSuccess?.();
             } catch (error) {
@@ -107,11 +128,22 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
 
                     {/* Details */}
                     <div className="space-y-3">
+                        {analyzing && (
+                            <p className="text-xs text-violet-500 text-center animate-pulse">
+                                Identifying wine...
+                            </p>
+                        )}
                         <div className="space-y-1">
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Name
                             </label>
-                            <Input name="name" placeholder="e.g. Château Margaux" required />
+                            <Input
+                                name="name"
+                                placeholder="e.g. Château Margaux"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                            />
                         </div>
 
                         <div className="space-y-1">
@@ -122,6 +154,8 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                 name="description"
                                 placeholder="Tasting notes, vintage, etc."
                                 className="min-h-[60px]"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 required
                             />
                         </div>
@@ -139,9 +173,9 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={isPending}
+                        disabled={isPending || analyzing}
                     >
-                        {isPending ? "Adding Wine..." : "Save to Collection"}
+                        {isPending ? "Adding Wine..." : analyzing ? "Analyzing..." : "Save to Collection"}
                     </Button>
                 </form>
             </CardContent>
