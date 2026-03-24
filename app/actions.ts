@@ -118,6 +118,28 @@ export async function generateShareToken(wineId: number): Promise<string> {
     return token;
 }
 
+export async function addSharedWine(token: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const wine = await prisma.wine.findUnique({ where: { shareToken: token } });
+    if (!wine) throw new Error("Wine not found");
+
+    if (wine.userId === user.id) throw new Error("Already in your collection");
+
+    await prisma.wine.create({
+        data: {
+            name: wine.name,
+            description: wine.description,
+            rating: wine.rating,
+            imagePath: wine.imagePath,
+            userId: user.id,
+        },
+    });
+
+    redirect("/");
+}
+
 export async function deleteWine(id: number) {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
@@ -125,9 +147,14 @@ export async function deleteWine(id: number) {
     const wine = await prisma.wine.findUnique({ where: { id } });
     if (!wine || wine.userId !== user.id) throw new Error("Not found");
 
-    // Delete image file
-    const filePath = path.join(process.cwd(), "public", wine.imagePath);
-    await fs.unlink(filePath).catch(() => {});
+    // Only delete the image file if no other wine references it
+    const otherRefs = await prisma.wine.count({
+        where: { imagePath: wine.imagePath, id: { not: id } },
+    });
+    if (otherRefs === 0) {
+        const filePath = path.join(process.cwd(), "public", wine.imagePath);
+        await fs.unlink(filePath).catch(() => {});
+    }
 
     await prisma.wine.delete({ where: { id } });
     revalidatePath("/");

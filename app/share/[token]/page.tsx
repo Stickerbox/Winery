@@ -1,18 +1,25 @@
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { RatingStar } from "@/components/ui/RatingStar";
+import { getCurrentUser } from "@/app/auth-actions";
+import { addSharedWine } from "@/app/actions";
 
 const prisma = new PrismaClient();
 
 export default async function SharePage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params;
 
-    const wine = await prisma.wine.findUnique({
-        where: { shareToken: token },
-        include: { user: true },
-    });
+    const [wine, user] = await Promise.all([
+        prisma.wine.findUnique({
+            where: { shareToken: token },
+            include: { user: true },
+        }),
+        getCurrentUser(),
+    ]);
 
     if (!wine) notFound();
+
+    const isOwnWine = user?.id === wine.userId;
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
@@ -43,12 +50,30 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                 </div>
 
                 <div className="px-5 pb-5">
-                    <a
-                        href="/"
-                        className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
-                    >
-                        Track your own wines on VinoVault
-                    </a>
+                    {isOwnWine ? (
+                        <a
+                            href="/"
+                            className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
+                        >
+                            View your collection
+                        </a>
+                    ) : user ? (
+                        <form action={addSharedWine.bind(null, token)}>
+                            <button
+                                type="submit"
+                                className="w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
+                            >
+                                Add to my wines
+                            </button>
+                        </form>
+                    ) : (
+                        <a
+                            href={`/login?redirect=/share/${token}`}
+                            className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
+                        >
+                            Log in to add to your wines
+                        </a>
+                    )}
                 </div>
             </div>
         </div>

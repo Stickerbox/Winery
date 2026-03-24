@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export async function login(formData: FormData) {
+export async function login(redirectTo: string = "/", formData: FormData) {
     const username = formData.get("username") as string;
 
     if (!username || username.trim().length === 0) {
@@ -32,7 +32,7 @@ export async function login(formData: FormData) {
         path: "/",
     });
 
-    redirect("/");
+    redirect(redirectTo);
 }
 
 export async function logout() {
