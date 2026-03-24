@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import sharp from "sharp";
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,7 @@ export async function addWine(formData: FormData) {
 
     // Handle image upload
     const buffer = Buffer.from(await image.arrayBuffer());
-    const filename = `${randomUUID()}-${image.name}`;
+    const filename = `${randomUUID()}.jpg`;
     const uploadDir = path.join(process.cwd(), "public", "uploads");
 
     try {
@@ -34,8 +35,13 @@ export async function addWine(formData: FormData) {
         await fs.mkdir(uploadDir, { recursive: true });
     }
 
+    const compressed = await sharp(buffer)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+
     const filepath = path.join(uploadDir, filename);
-    await fs.writeFile(filepath, buffer);
+    await fs.writeFile(filepath, compressed);
 
     const imagePath = `/uploads/${filename}`;
 
