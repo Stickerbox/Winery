@@ -47,7 +47,8 @@ No other text before or after the JSON.`,
         }],
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text.trim() : "";
+    let text = response.content[0].type === "text" ? response.content[0].text.trim() : "";
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
     return JSON.parse(text) as { name: string; description: string };
 }
 
