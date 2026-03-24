@@ -1,10 +1,6 @@
 import type { en } from "./en";
 
-type TranslationStructure<T> = T extends object
-  ? { [K in keyof T]: T[K] extends object ? TranslationStructure<T[K]> : string }
-  : string;
-
-export const fr: TranslationStructure<typeof en> = {
+export const fr = {
   common: {
     delete: "Supprimer",
     share: "Partager",
@@ -54,4 +50,4 @@ export const fr: TranslationStructure<typeof en> = {
     addToMine: "Ajouter à mes vins",
     loginToAdd: "Connectez-vous pour ajouter à vos vins",
   },
-};
+} satisfies typeof en;

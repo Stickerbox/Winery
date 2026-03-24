@@ -4,8 +4,8 @@ import { fr } from "./fr";
 export type Lang = "en" | "fr";
 export type Translations = typeof en;
 
-const translations = { en, fr };
+const translations = { en, fr } as const;
 
 export function getT(lang: string): Translations {
-  return (lang === "fr" ? translations.fr : translations.en) as Translations;
+  return lang === "fr" ? translations.fr : translations.en;
 }

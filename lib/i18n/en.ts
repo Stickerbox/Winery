@@ -48,4 +48,4 @@ export const en = {
     addToMine: "Add to my wines",
     loginToAdd: "Log in to add to your wines",
   },
-} as const;
+};
