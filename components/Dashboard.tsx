@@ -21,14 +21,27 @@ export function Dashboard({ wines, user }: DashboardProps) {
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
+    const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "rating-high" | "rating-low">("newest");
     const searchInputRef = React.useRef<HTMLInputElement>(null);
 
-    const filteredWines = searchQuery.trim()
-        ? wines.filter((w) =>
-              w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              w.description.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-        : wines;
+    const filteredWines = React.useMemo(() => {
+        let result = searchQuery.trim()
+            ? wines.filter((w) =>
+                  w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  w.description.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+            : [...wines];
+
+        result.sort((a, b) => {
+            if (sortBy === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            if (sortBy === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            if (sortBy === "rating-high") return b.rating - a.rating;
+            if (sortBy === "rating-low") return a.rating - b.rating;
+            return 0;
+        });
+
+        return result;
+    }, [wines, searchQuery, sortBy]);
 
     const handleSearchToggle = () => {
         if (isSearchOpen) {
@@ -77,26 +90,34 @@ export function Dashboard({ wines, user }: DashboardProps) {
                         </form>
                     </div>
                 </div>
-                <AnimatePresence>
-                    {isSearchOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                        >
-                            <input
+                <div className="flex items-center gap-2">
+                    <AnimatePresence>
+                        {isSearchOpen && (
+                            <motion.input
                                 ref={searchInputRef}
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: "100%" }}
+                                exit={{ opacity: 0, width: 0 }}
+                                transition={{ duration: 0.2 }}
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search wines..."
-                                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                                className="flex-1 min-w-0 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
                             />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                        )}
+                    </AnimatePresence>
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                        className="ml-auto rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                    >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="rating-high">Rating ↓</option>
+                        <option value="rating-low">Rating ↑</option>
+                    </select>
+                </div>
             </header>
 
             <main className="container mx-auto max-w-7xl">
