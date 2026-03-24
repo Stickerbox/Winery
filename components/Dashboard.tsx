@@ -66,6 +66,16 @@ export function Dashboard({ wines, user }: DashboardProps) {
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                            className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                        >
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="rating-high">Rating ↓</option>
+                            <option value="rating-low">Rating ↑</option>
+                        </select>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -90,34 +100,26 @@ export function Dashboard({ wines, user }: DashboardProps) {
                         </form>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <AnimatePresence>
-                        {isSearchOpen && (
-                            <motion.input
+                <AnimatePresence>
+                    {isSearchOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                        >
+                            <input
                                 ref={searchInputRef}
-                                initial={{ opacity: 0, width: 0 }}
-                                animate={{ opacity: 1, width: "100%" }}
-                                exit={{ opacity: 0, width: 0 }}
-                                transition={{ duration: 0.2 }}
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search wines..."
-                                className="flex-1 min-w-0 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
                             />
-                        )}
-                    </AnimatePresence>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                        className="ml-auto rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
-                    >
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                        <option value="rating-high">Rating ↓</option>
-                        <option value="rating-low">Rating ↑</option>
-                    </select>
-                </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </header>
 
             <main className="container mx-auto max-w-7xl">
