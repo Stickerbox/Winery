@@ -168,7 +168,7 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
                                     </div>
                                 </div>
 
-                                <Button type="submit" className="w-full" disabled={isPending}>
+                                <Button type="submit" className="w-full" disabled={isPending || rating === 0}>
                                     {isPending ? "Adding Wine..." : "Save to Collection"}
                                 </Button>
                             </motion.div>
