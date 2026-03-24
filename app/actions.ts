@@ -3,6 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
@@ -16,6 +17,9 @@ import { getCurrentUser } from "./auth-actions";
 export async function analyzeWineImage(formData: FormData): Promise<{ name: string; description: string }> {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
+
+    const lang = (await cookies()).get("lang")?.value ?? "en";
+    const langInstruction = lang === "fr" ? "Réponds en français." : "Respond in English.";
 
     const image = formData.get("image") as File;
     if (!image) throw new Error("No image provided");
@@ -45,7 +49,7 @@ If you can identify the wine, return ONLY a JSON object with exactly these two f
   "name": "producer/winery, wine name, and vintage year if visible",
   "description": "one sentence tasting note covering the key flavours and a food pairing"
 }
-No other text before or after the JSON.`,
+No other text before or after the JSON. ${langInstruction}`,
                 },
             ],
         }],
