@@ -9,6 +9,7 @@ export function LanguageToggle() {
     <div className="flex items-center justify-center gap-2 text-sm py-2">
       <span className="text-zinc-400">🌐</span>
       <button
+        type="button"
         onClick={() => setLang("en")}
         className={
           lang === "en"
@@ -20,6 +21,7 @@ export function LanguageToggle() {
       </button>
       <span className="text-zinc-300 dark:text-zinc-600">·</span>
       <button
+        type="button"
         onClick={() => setLang("fr")}
         className={
           lang === "fr"

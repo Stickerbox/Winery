@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { LanguageProvider } from "@/components/LanguageContext";
 
 const geistSans = Geist({
@@ -18,13 +19,15 @@ export const metadata: Metadata = {
   description: "Your personal wine collection",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const lang = (await cookies()).get("lang")?.value ?? "en";
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <LanguageProvider>
           {children}
