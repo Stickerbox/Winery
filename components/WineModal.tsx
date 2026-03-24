@@ -16,6 +16,7 @@ interface WineModalProps {
 
 export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
+    const [shareUrl, setShareUrl] = React.useState<string | null>(null);
 
     async function handleDelete() {
         await deleteWine(wine.id);
@@ -26,12 +27,18 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     async function handleShare() {
         const token = await generateShareToken(wine.id);
         const url = `${window.location.origin}/share/${token}`;
-        if (navigator.share) {
-            await navigator.share({ title: wine.name, url });
-        } else {
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: wine.name, url });
+                return;
+            }
             await navigator.clipboard.writeText(url);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // TODO: Remove this fallback once HTTPS/SSL is configured —
+            // navigator.share and navigator.clipboard both require a secure context.
+            setShareUrl(url);
         }
     }
     return (
@@ -110,6 +117,18 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                 {wine.description}
                             </p>
                         </div>
+
+                        {shareUrl && (
+                            <div className="mt-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                                <p className="text-xs text-zinc-500 mb-1">Copy this link:</p>
+                                <input
+                                    readOnly
+                                    value={shareUrl}
+                                    onFocus={(e) => e.target.select()}
+                                    className="w-full text-xs bg-transparent text-zinc-700 dark:text-zinc-300 outline-none"
+                                />
+                            </div>
+                        )}
 
                         <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                             <Button
