@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar, Trash2 } from "lucide-react";
+import { X, Calendar, Trash2, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion } from "framer-motion";
-import { deleteWine } from "@/app/actions";
+import { deleteWine, generateShareToken } from "@/app/actions";
 
 interface WineModalProps {
     wine: Wine;
@@ -15,10 +15,20 @@ interface WineModalProps {
 }
 
 export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
+    const [copied, setCopied] = React.useState(false);
+
     async function handleDelete() {
         await deleteWine(wine.id);
         onClose();
         onDelete?.();
+    }
+
+    async function handleShare() {
+        const token = await generateShareToken(wine.id);
+        const url = `${window.location.origin}/share/${token}`;
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     }
     return (
         <>
@@ -87,14 +97,22 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                             </p>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                             <Button
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
                                 onClick={handleDelete}
                             >
                                 <Trash2 className="h-4 w-4" />
-                                Delete Wine
+                                Delete
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                className="gap-2 text-zinc-600 dark:text-zinc-400"
+                                onClick={handleShare}
+                            >
+                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
+                                {copied ? "Copied!" : "Share"}
                             </Button>
                         </div>
                     </div>

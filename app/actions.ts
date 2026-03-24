@@ -101,6 +101,20 @@ export async function addWine(formData: FormData) {
     revalidatePath("/");
 }
 
+export async function generateShareToken(wineId: number): Promise<string> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const wine = await prisma.wine.findUnique({ where: { id: wineId } });
+    if (!wine || wine.userId !== user.id) throw new Error("Not found");
+
+    if (wine.shareToken) return wine.shareToken;
+
+    const token = randomUUID();
+    await prisma.wine.update({ where: { id: wineId }, data: { shareToken: token } });
+    return token;
+}
+
 export async function deleteWine(id: number) {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");

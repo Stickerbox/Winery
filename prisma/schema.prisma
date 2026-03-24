@@ -26,4 +26,5 @@ model Wine {
   createdAt   DateTime @default(now())
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
+  shareToken  String?  @unique
 }
