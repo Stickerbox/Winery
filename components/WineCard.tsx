@@ -10,9 +10,10 @@ import { motion } from "framer-motion";
 interface WineCardProps {
     wine: Wine;
     onClick?: () => void;
+    readonly?: boolean;
 }
 
-export function WineCard({ wine, onClick }: WineCardProps) {
+export function WineCard({ wine, onClick, readonly }: WineCardProps) {
     return (
         <motion.div
             layoutId={`wine-${wine.id}`}

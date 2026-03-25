@@ -9,9 +9,10 @@ import { motion } from "framer-motion";
 interface WineGridProps {
     wines: Wine[];
     onWineClick: (wine: Wine) => void;
+    readonly?: boolean;
 }
 
-export function WineGrid({ wines, onWineClick }: WineGridProps) {
+export function WineGrid({ wines, onWineClick, readonly }: WineGridProps) {
     const { t } = useTranslations();
 
     if (wines.length === 0) {
@@ -26,7 +27,7 @@ export function WineGrid({ wines, onWineClick }: WineGridProps) {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
             {wines.map((wine) => (
-                <WineCard key={wine.id} wine={wine} onClick={() => onWineClick(wine)} />
+                <WineCard key={wine.id} wine={wine} onClick={() => onWineClick(wine)} readonly={readonly} />
             ))}
         </div>
     );
