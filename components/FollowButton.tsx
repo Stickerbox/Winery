@@ -13,6 +13,9 @@ interface FollowButtonProps {
 export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) {
     const [isFollowing, setIsFollowing] = React.useState(initialIsFollowing);
     const [isPending, setIsPending] = React.useState(false);
+    React.useEffect(() => {
+        setIsFollowing(initialIsFollowing);
+    }, [initialIsFollowing]);
     const { t } = useTranslations();
 
     async function handleClick() {
