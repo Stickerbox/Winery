@@ -207,9 +207,9 @@ w-full max-w-sm mx-auto overflow-hidden
 
 **Current:** `border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800`
 
-**Replace with:**
+**Replace with (full result — preserve trailing layout classes):**
 ```
-border-2 border-dashed border-white/40 dark:border-white/35 bg-white/20 dark:bg-white/25 hover:bg-white/30 dark:hover:bg-white/35
+border-2 border-dashed border-white/40 dark:border-white/35 bg-white/20 dark:bg-white/25 hover:bg-white/30 dark:hover:bg-white/35 transition-colors flex items-center justify-center cursor-pointer
 ```
 
 Light mode: `bg-white/20` appears slightly more transparent than the card (`bg-white/65`), providing a subtle recessed feel. Dark mode: `bg-white/25` provides visible contrast over the card's `bg-white/15`.
