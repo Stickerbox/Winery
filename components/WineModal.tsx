@@ -32,6 +32,14 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
         onSwipedRight: () => { if (hasPrev && !confirmingDelete) onPrev(); },
         preventScrollOnSwipe: true,
     });
+
+    React.useEffect(() => {
+        setConfirmingDelete(false);
+        setDeleting(false);
+        setDeleteError(null);
+        setCopied(false);
+    }, [wine.id]);
+
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
     React.useEffect(() => {
