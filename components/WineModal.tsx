@@ -14,13 +14,23 @@ interface WineModalProps {
     wine: Wine;
     onClose: () => void;
     onDelete?: () => void;
-    hasPrev: boolean;
-    hasNext: boolean;
-    onPrev: () => void;
-    onNext: () => void;
+    readonly?: boolean;
+    hasPrev?: boolean;
+    hasNext?: boolean;
+    onPrev?: () => void;
+    onNext?: () => void;
 }
 
-export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, onNext }: WineModalProps) {
+export function WineModal({
+    wine,
+    onClose,
+    onDelete,
+    readonly = false,
+    hasPrev = false,
+    hasNext = false,
+    onPrev = () => {},
+    onNext = () => {},
+}: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
     const [confirmingDelete, setConfirmingDelete] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
@@ -209,24 +219,26 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                             </p>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-                            <Button
-                                variant="ghost"
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
-                                onClick={() => setConfirmingDelete(true)}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                                {t.common.delete}
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="hidden md:flex gap-2 text-zinc-600 dark:text-zinc-400"
-                                onClick={handleShare}
-                            >
-                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
-                                {copied ? t.common.copied : t.common.share}
-                            </Button>
-                        </div>
+                        {!readonly && (
+                            <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                                <Button
+                                    variant="ghost"
+                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
+                                    onClick={() => setConfirmingDelete(true)}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    {t.common.delete}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    className="hidden md:flex gap-2 text-zinc-600 dark:text-zinc-400"
+                                    onClick={handleShare}
+                                >
+                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
+                                    {copied ? t.common.copied : t.common.share}
+                                </Button>
+                            </div>
+                        )}
                     </motion.div>
                 </motion.div>
 
