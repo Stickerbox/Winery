@@ -110,7 +110,7 @@ export function WineModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
                 onClick={confirmingDelete ? undefined : onClose}
             />
             <div {...swipeHandlers} className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
@@ -127,14 +127,14 @@ export function WineModal({
 
                 <motion.div
                     layoutId={`wine-${openedForWineId.current}`}
-                    className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
+                    className="w-full max-w-2xl bg-white/75 dark:bg-white/20 backdrop-blur-xl border border-white/50 dark:border-white/25 rounded-2xl overflow-hidden shadow-[var(--glass-shadow)] pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
                 >
                     <motion.div
                         key={`img-${wine.id}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.15 }}
-                        className="relative w-full md:w-1/2 h-64 md:h-auto bg-zinc-100 dark:bg-zinc-800"
+                        className="relative w-full md:w-1/2 h-64 md:h-auto bg-white/10"
                     >
                         <img
                             src={wine.imagePath}
@@ -163,12 +163,12 @@ export function WineModal({
                                 <motion.h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">
                                     {wine.name}
                                 </motion.h2>
-                                <div className="flex items-center text-zinc-500 dark:text-zinc-400 text-sm">
+                                <div className="flex items-center text-zinc-500 dark:text-white/50 text-sm">
                                     <Calendar className="h-4 w-4 mr-1" />
                                     {new Date(wine.createdAt).toLocaleDateString()}
                                 </div>
                                 {wine.sharedByUsername && (
-                                    <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 ring-1 ring-violet-200 dark:ring-violet-700/50">
+                                    <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 text-violet-700 dark:text-violet-300 border border-white/40 dark:border-white/30">
                                         {t.share.sharedBy.replace("{username}", wine.sharedByUsername)}
                                     </span>
                                 )}
@@ -195,13 +195,13 @@ export function WineModal({
 
                         <div className="mb-8">
                             <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                                <h3 className="text-sm font-medium text-zinc-500 dark:text-white/50 uppercase tracking-wider">
                                     {t.common.rating}
                                 </h3>
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="md:hidden rounded-full text-zinc-500 dark:text-zinc-400"
+                                    className="md:hidden rounded-full text-zinc-500 dark:text-white/60"
                                     onClick={handleShare}
                                 >
                                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
@@ -211,16 +211,16 @@ export function WineModal({
                         </div>
 
                         <div className="flex-1">
-                            <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
+                            <h3 className="text-sm font-medium text-zinc-500 dark:text-white/50 uppercase tracking-wider mb-3">
                                 {t.wineModal.tastingNotes}
                             </h3>
-                            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-zinc-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
                                 {wine.description}
                             </p>
                         </div>
 
                         {!readonly && (
-                            <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                            <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/15 flex items-center justify-between">
                                 <Button
                                     variant="ghost"
                                     className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
@@ -231,7 +231,7 @@ export function WineModal({
                                 </Button>
                                 <Button
                                     variant="ghost"
-                                    className="hidden md:flex gap-2 text-zinc-600 dark:text-zinc-400"
+                                    className="hidden md:flex gap-2 text-zinc-600 dark:text-white/60"
                                     onClick={handleShare}
                                 >
                                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
@@ -273,7 +273,7 @@ export function WineModal({
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.15 }}
-                                className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl pointer-events-auto"
+                                className="w-full max-w-sm bg-white/75 dark:bg-white/20 backdrop-blur-xl border border-white/50 dark:border-white/25 rounded-2xl p-6 shadow-[var(--glass-shadow)] pointer-events-auto"
                             >
                                 <p className="text-zinc-900 dark:text-white font-semibold text-lg mb-2">
                                     {t.wineModal.deleteConfirm}
