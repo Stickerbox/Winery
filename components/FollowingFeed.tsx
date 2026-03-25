@@ -15,7 +15,7 @@ interface FollowingFeedProps {
 }
 
 export function FollowingFeed({ wines }: FollowingFeedProps) {
-    const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
+    const [selectedWine, setSelectedWine] = React.useState<FeedWine | null>(null);
     const { t } = useTranslations();
 
     if (wines.length === 0) {
