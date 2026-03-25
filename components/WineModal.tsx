@@ -40,6 +40,17 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [confirmingDelete, deleting]);
 
+    React.useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if (confirmingDelete) return;
+            if (e.key === "ArrowLeft" && hasPrev) onPrev();
+            if (e.key === "ArrowRight" && hasNext) onNext();
+            if (e.key === "Escape") onClose();
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [hasPrev, hasNext, onPrev, onNext, onClose, confirmingDelete]);
+
     async function handleDelete() {
         setDeleting(true);
         try {
