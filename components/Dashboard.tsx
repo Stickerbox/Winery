@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Search } from "lucide-react";
+import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark } from "lucide-react";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
@@ -128,18 +128,16 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
             </header>
 
             <main className="container mx-auto max-w-7xl">
-                <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-4">
+                <div className="hidden sm:flex border-b border-zinc-200 dark:border-zinc-800 px-4">
                     {(["collection", "following", "wishlist"] as const).map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => tab !== "wishlist" && setActiveTab(tab)}
-                            disabled={tab === "wishlist"}
+                            onClick={() => setActiveTab(tab)}
                             className={cn(
                                 "px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                                 activeTab === tab
                                     ? "border-violet-600 text-violet-600"
-                                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100",
-                                tab === "wishlist" && "opacity-40 cursor-not-allowed"
+                                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                             )}
                         >
                             {tab === "collection"
