@@ -21,10 +21,10 @@ export function WineCard({ wine, onClick, readonly }: WineCardProps) {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
             <Card
-                className="overflow-hidden cursor-pointer group hover:shadow-xl transition-shadow border-0 ring-1 ring-zinc-200 dark:ring-zinc-800 bg-white dark:bg-zinc-900"
+                className="overflow-hidden cursor-pointer group transition-shadow hover:shadow-[var(--glass-shadow-hover)]"
                 onClick={onClick}
             >
-                <div className="aspect-[4/5] relative overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                <div className="aspect-[4/5] relative overflow-hidden bg-white/10">
                     <img
                         src={wine.imagePath}
                         alt={wine.name}
