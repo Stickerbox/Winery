@@ -117,7 +117,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <ExternalLink className="h-3 w-3" />
-                                    Go to SAQ
+                                    {t.wineModal.goToSAQ}
                                 </a>
                             </div>
                             <Button
