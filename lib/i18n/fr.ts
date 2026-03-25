@@ -6,6 +6,7 @@ export const fr = {
     share: "Partager",
     copied: "Copié !",
     rating: "Note",
+    cancel: "Annuler",
   },
   dashboard: {
     welcome: "Bienvenue, {username}",
@@ -33,6 +34,8 @@ export const fr = {
   },
   wineModal: {
     tastingNotes: "Notes de dégustation",
+    deleteConfirm: "Supprimer ce vin ?",
+    deleteConfirmAction: "Oui, supprimer",
   },
   wineGrid: {
     emptyTitle: "Aucun vin ajouté pour l'instant.",
