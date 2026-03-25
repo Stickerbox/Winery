@@ -25,6 +25,7 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
     const [deleting, setDeleting] = React.useState(false);
     const [deleteError, setDeleteError] = React.useState<string | null>(null);
     const { t, lang } = useTranslations();
+    const openedForWineId = React.useRef(wine.id);
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
     React.useEffect(() => {
@@ -79,10 +80,16 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
                 <motion.div
-                    layoutId={`wine-${wine.id}`}
+                    layoutId={`wine-${openedForWineId.current}`}
                     className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
                 >
-                    <div className="relative w-full md:w-1/2 h-64 md:h-auto bg-zinc-100 dark:bg-zinc-800">
+                    <motion.div
+                        key={`img-${wine.id}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
+                        className="relative w-full md:w-1/2 h-64 md:h-auto bg-zinc-100 dark:bg-zinc-800"
+                    >
                         <img
                             src={wine.imagePath}
                             alt={wine.name}
@@ -96,9 +103,15 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                         >
                             <X className="h-5 w-5" />
                         </Button>
-                    </div>
+                    </motion.div>
 
-                    <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto">
+                    <motion.div
+                        key={`content-${wine.id}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
+                        className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto"
+                    >
                         <div className="flex items-start justify-between mb-6">
                             <div>
                                 <motion.h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">
@@ -178,7 +191,7 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                                 {copied ? t.common.copied : t.common.share}
                             </Button>
                         </div>
-                    </div>
+                    </motion.div>
                 </motion.div>
             </div>
             <AnimatePresence>
