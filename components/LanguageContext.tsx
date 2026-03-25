@@ -1,36 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { getT, type Lang, type Translations } from "@/lib/i18n";
+import { getT, detectClientLang, type Lang, type Translations } from "@/lib/i18n";
 
 interface LanguageContextValue {
   lang: Lang;
-  setLang: (lang: Lang) => void;
   t: Translations;
 }
 
 const LanguageContext = React.createContext<LanguageContextValue | null>(null);
 
-function readLangCookie(): Lang {
-  if (typeof document === "undefined") return "en";
-  const match = document.cookie.match(/(?:^|;\s*)lang=([^;]*)/);
-  return match?.[1] === "fr" ? "fr" : "en";
-}
-
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = React.useState<Lang>("en");
 
   React.useEffect(() => {
-    setLangState(readLangCookie());
-  }, []);
-
-  const setLang = React.useCallback((next: Lang) => {
-    setLangState(next);
-    document.cookie = `lang=${next}; path=/; max-age=31536000; SameSite=Lax`;
+    setLangState(detectClientLang());
   }, []);
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t: getT(lang) }}>
+    <LanguageContext.Provider value={{ lang, t: getT(lang) }}>
       {children}
     </LanguageContext.Provider>
   );
