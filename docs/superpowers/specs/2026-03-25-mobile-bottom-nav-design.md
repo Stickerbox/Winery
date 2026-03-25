@@ -30,29 +30,45 @@ The existing tab bar stays as-is — full-width underline style rendered at the 
 **Active tab indicator:** Inner pill highlight — `bg-violet-100 dark:bg-violet-900/40 text-violet-600 rounded-xl`. Inactive tabs are `text-zinc-500`.
 
 **Icons** (lucide-react, already available):
-- Collection → `Wine`
+- Collection → `Wine` (aliased as `WineIcon` — see Icon Import Alias section)
 - Following → `Users`
 - Wishlist → `Bookmark`
 
-Each button shows icon + label stacked vertically (`flex-col items-center gap-0.5`).
+Icons render at `h-5 w-5`.
+
+Each button shows icon + label stacked vertically (`flex-col items-center gap-0.5`). Labels use the existing translation keys already in scope: `t.dashboard.tabCollection`, `t.dashboard.tabFollowing`, `t.dashboard.tabWishlist`.
+
+**z-index:** The bottom nav sits at `z-20`. This places it below the FAB (`z-30`), the modal overlay (`z-40`), and the modal itself (`z-50`). When the Add Wine modal is open, the bottom nav is covered by the backdrop — correct behaviour.
+
+## Icon Import Alias
+
+`lucide-react` exports a `Wine` icon, but `Dashboard.tsx` already imports `Wine` (the Prisma model type) from `@prisma/client`. To avoid a naming collision, alias the lucide icon on import:
+
+```ts
+import { Wine as WineIcon, Users, Bookmark } from "lucide-react";
+```
+
+Use `<WineIcon />` for the Collection tab icon.
 
 ## FAB Adjustment
 
-The floating `+` add-wine button shifts upward on mobile to sit above the bottom nav:
+The floating `+` add-wine button shifts upward on mobile to sit above the bottom nav. The bottom nav bar renders at approximately 56px tall with a `bottom-4` (16px) offset, placing its top edge ~72px from the viewport bottom. `bottom-24` (96px) provides ~24px of clearance above it — a deliberate value, not a guess. Adjust if the rendered height differs.
+
 - Mobile: `bottom-24`
 - Desktop: `bottom-6`
 - Achieved with: `bottom-24 sm:bottom-6`
 
 ## Content Padding
 
-Bump `pb-20` on the root container to `pb-36 sm:pb-20` so content is not hidden behind the bottom nav on mobile.
+Bump `pb-20` on the root `<div>` container to `pb-36 sm:pb-20` so content (including the `LanguageToggle` rendered at the bottom of `<main>`) is not hidden behind the bottom nav on mobile. The `LanguageToggle` wrapper has its own `pb-6` which is additive; `pb-36` on the root container is sufficient to push all content clear of the nav bar. The value is intentionally generous (144px vs ~72px nav height) to account for varying rendered heights and safe-area insets on mobile browsers.
 
 ## Wishlist Tab
 
-Remove the `disabled` prop and `opacity-40 cursor-not-allowed` styling from the Wishlist tab. The tab renders `null` for content — this is acceptable until the Wishlist feature is built out.
+Remove the `disabled` prop and `opacity-40 cursor-not-allowed` styling from the Wishlist tab in the desktop tab bar.
+
+Also replace the conditional `onClick` guard `onClick={() => tab !== "wishlist" && setActiveTab(tab)}` with a plain `onClick={() => setActiveTab(tab)}` call for all three tabs. The tab renders `null` for content — this is acceptable until the Wishlist feature is built out.
 
 ## What Does Not Change
 
-- Desktop tab bar markup and styling
 - Tab state management (`activeTab` state, `setActiveTab`)
-- All other Dashboard layout and features
+- All other Dashboard layout and features outside the tab bar and FAB
