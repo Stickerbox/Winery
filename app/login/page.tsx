@@ -12,8 +12,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     const t = getT(lang);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 gap-4">
-            <Card className="w-full max-w-md border-0 shadow-xl ring-1 ring-zinc-200 dark:ring-zinc-800">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-4">
+            <Card className="w-full max-w-md bg-white/35 dark:bg-white/20 backdrop-blur-xl border border-white/40 dark:border-white/25">
                 <CardHeader className="text-center space-y-2">
                     <CardTitle className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
                         VinoVault
@@ -29,7 +29,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                                 name="username"
                                 placeholder={t.login.usernamePlaceholder}
                                 required
-                                className="h-12 text-lg"
+                                className="h-12 text-lg bg-white/30 dark:bg-white/10 border-white/30 dark:border-white/20 placeholder:text-zinc-400 dark:placeholder:text-white/40"
                             />
                         </div>
                         <Button type="submit" className="w-full h-12 text-lg">
