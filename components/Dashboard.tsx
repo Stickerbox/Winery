@@ -33,7 +33,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
     const { t } = useTranslations();
 
     const filteredWines = React.useMemo(() => {
-        let result = searchQuery.trim()
+        const result = searchQuery.trim()
             ? wines.filter((w) =>
                   w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   w.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -218,6 +218,33 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                     />
                 )}
             </AnimatePresence>
+
+            {/* Mobile Bottom Nav */}
+            <nav className="fixed bottom-4 left-4 right-4 z-20 flex sm:hidden items-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-[0_0_16px_0_rgba(0,0,0,0.10)] p-2">
+                {(["collection", "following", "wishlist"] as const).map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                            "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs font-medium transition-colors",
+                            activeTab === tab
+                                ? "bg-violet-100 dark:bg-violet-900/40 text-violet-600"
+                                : "text-zinc-500"
+                        )}
+                    >
+                        {tab === "collection" && <WineIcon className="h-5 w-5" />}
+                        {tab === "following" && <Users className="h-5 w-5" />}
+                        {tab === "wishlist" && <Bookmark className="h-5 w-5" />}
+                        <span>
+                            {tab === "collection"
+                                ? t.dashboard.tabCollection
+                                : tab === "following"
+                                ? t.dashboard.tabFollowing
+                                : t.dashboard.tabWishlist}
+                        </span>
+                    </button>
+                ))}
+            </nav>
         </div>
     );
 }
