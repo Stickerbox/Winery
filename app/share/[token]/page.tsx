@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { getCurrentUser } from "@/app/auth-actions";
 import { addSharedWine } from "@/app/actions";
@@ -26,13 +28,14 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
     const isOwnWine = user?.id === wine.userId;
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4 gap-4">
-            <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xl ring-1 ring-zinc-200 dark:ring-zinc-800">
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                    <img
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-4">
+            <div className="w-full max-w-sm bg-white/65 dark:bg-white/15 backdrop-blur-lg border border-white/50 dark:border-white/20 rounded-2xl overflow-hidden shadow-[var(--glass-shadow)]">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/10">
+                    <Image
                         src={wine.imagePath}
                         alt={wine.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -46,23 +49,23 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                 <div className="p-5 space-y-4">
                     <RatingStar rating={wine.rating} readonly className="gap-1" />
 
-                    <p className="text-zinc-600 dark:text-zinc-300 text-sm leading-relaxed">
+                    <p className="text-zinc-700 dark:text-white/80 text-sm leading-relaxed">
                         {wine.description}
                     </p>
 
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-zinc-400 dark:text-white/40">
                         {t.share.added.replace("{date}", new Date(wine.createdAt).toLocaleDateString())}
                     </p>
                 </div>
 
                 <div className="px-5 pb-5">
                     {isOwnWine ? (
-                        <a
+                        <Link
                             href="/"
                             className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
                         >
                             {t.share.viewCollection}
-                        </a>
+                        </Link>
                     ) : user ? (
                         <form action={addSharedWine.bind(null, token)}>
                             <button
