@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar, Trash2, Share2, Check, ExternalLink } from "lucide-react";
+import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -104,6 +104,17 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                 onClick={confirmingDelete ? undefined : onClose}
             />
             <div {...swipeHandlers} className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+                <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={t.wineModal.prevWine}
+                    disabled={!hasPrev}
+                    onClick={onPrev}
+                    className="hidden md:flex pointer-events-auto shrink-0 rounded-full mr-2 text-white bg-black/20 hover:bg-black/40 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                    <ChevronLeft className="h-6 w-6" />
+                </Button>
+
                 <motion.div
                     layoutId={`wine-${openedForWineId.current}`}
                     className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
@@ -218,6 +229,17 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                         </div>
                     </motion.div>
                 </motion.div>
+
+                <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={t.wineModal.nextWine}
+                    disabled={!hasNext}
+                    onClick={onNext}
+                    className="hidden md:flex pointer-events-auto shrink-0 rounded-full ml-2 text-white bg-black/20 hover:bg-black/40 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                    <ChevronRight className="h-6 w-6" />
+                </Button>
             </div>
             <AnimatePresence>
                 {confirmingDelete && (
