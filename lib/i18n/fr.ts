@@ -18,6 +18,9 @@ export const fr = {
     searchTitle: "Rechercher",
     logoutTitle: "Déconnexion",
     addWineTitle: "Ajouter un vin",
+    tabCollection: "Collection",
+    tabFollowing: "Abonnements",
+    tabWishlist: "Liste de souhaits",
   },
   wineForm: {
     takePhoto: "Prenez une photo de votre vin",
@@ -57,5 +60,14 @@ export const fr = {
     viewCollection: "Voir votre collection",
     addToMine: "Ajouter à mes vins",
     loginToAdd: "Connectez-vous pour ajouter à vos vins",
+  },
+  profile: {
+    follow: "Suivre",
+    unfollow: "Ne plus suivre",
+    wineCount: "{count} vins",
+  },
+  feed: {
+    empty: "Suivez des utilisateurs pour voir leurs vins ici.",
+    by: "par {username}",
   },
 } satisfies typeof en;
