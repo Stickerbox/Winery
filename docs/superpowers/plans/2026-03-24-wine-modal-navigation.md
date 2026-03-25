@@ -60,36 +60,20 @@ git commit -m "chore: install react-swipeable for touch gesture support"
 
 - [ ] **Step 1: Add keys to `lib/i18n/en.ts`**
 
-Inside the `wineModal` object, add after `goToSAQ`:
+Find the `wineModal` object. After the `goToSAQ` line, **append** these two lines (do not replace the whole block):
 
 ```ts
-wineModal: {
-    tastingNotes: "Tasting Notes",
-    deleteConfirm: "Delete this wine?",
-    deleteConfirmAction: "Yes, delete",
-    deleting: "Deleting…",
-    deleteFailed: "Failed to delete wine",
-    goToSAQ: "Go to SAQ",
     prevWine: "Previous wine",
     nextWine: "Next wine",
-},
 ```
 
 - [ ] **Step 2: Add keys to `lib/i18n/fr.ts`**
 
-Inside the `wineModal` object, add after `goToSAQ`:
+Same edit — find the `wineModal` object, append after `goToSAQ`:
 
 ```ts
-wineModal: {
-    tastingNotes: "Notes de dégustation",
-    deleteConfirm: "Supprimer ce vin ?",
-    deleteConfirmAction: "Oui, supprimer",
-    deleting: "Suppression…",
-    deleteFailed: "Échec de la suppression",
-    goToSAQ: "Aller sur SAQ",
     prevWine: "Vin précédent",
     nextWine: "Vin suivant",
-},
 ```
 
 - [ ] **Step 3: Verify TypeScript is happy**
@@ -244,7 +228,7 @@ Find the content panel div (currently `<div className="flex-1 flex flex-col p-6 
 </motion.div>
 ```
 
-No `AnimatePresence` wrapper is needed. React re-mounts keyed elements with a short opacity fade on each key change. Neither inner `motion.div` carries a `layoutId`, so they don't conflict with the outer layout animation.
+No `AnimatePresence` wrapper is needed here — only enter fades, no exit animations. Do not add one. Neither inner `motion.div` carries a `layoutId`, so they don't conflict with the outer layout animation.
 
 - [ ] **Step 5: Verify the build**
 
@@ -286,6 +270,8 @@ React.useEffect(() => {
 ```
 
 Note: `Escape → onClose()` is **new behavior** — the current codebase has no Escape-to-close handler when `confirmingDelete` is false. This adds it.
+
+The two effects coexist safely: when `confirmingDelete` is `true`, this new effect's `if (confirmingDelete) return` guard fires first (no navigation, no close), while the original effect handles Escape to cancel the dialog. When `confirmingDelete` is `false`, the original effect's `if (!confirmingDelete) return` guard exits early, so only this new effect handles Escape. No double-firing occurs. Do not consolidate the two effects — keeping them separate preserves this clean separation.
 
 - [ ] **Step 2: Verify the build**
 
@@ -335,21 +321,15 @@ const swipeHandlers = useSwipeable({
 
 `preventScrollOnSwipe: true` prevents horizontal swipes from interfering with vertical scroll in the `overflow-y-auto` content panel.
 
-- [ ] **Step 3: Spread swipe handlers onto the modal card `motion.div`**
+- [ ] **Step 3: Spread swipe handlers onto the outer container div**
 
-Find the outer positioning container (the `fixed inset-0 z-50` div) and spread the handlers onto the `motion.div` inside it — the one with `layoutId` and `className="w-full max-w-2xl ..."`:
+Find the outer positioning `div` (currently `<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">`). Spread the handlers onto it:
 
 ```tsx
-<motion.div
-    {...swipeHandlers}
-    layoutId={`wine-${openedForWineId.current}`}
-    className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
->
+<div {...swipeHandlers} className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
 ```
 
-**Do not** spread `swipeHandlers` on the outer `pointer-events-none` container — CSS `pointer-events: none` suppresses all pointer and touch events before they reach JavaScript listeners, so swipe gestures would be silently ignored on mobile.
-
-Spreading on `motion.div` is safe: Framer Motion uses `forwardRef` and manages its own internal refs separately from the forwarded `ref` prop. The `ref` callback in `swipeHandlers` becomes the forwarded ref, reaches the DOM node, and `react-swipeable` attaches its touch listeners successfully.
+CSS `pointer-events: none` only affects pointer hit-testing for mouse events — it does **not** suppress native touch events. `react-swipeable` attaches `touchstart`/`touchmove`/`touchend` listeners which work correctly on a `pointer-events: none` element. Spreading on the container (rather than the `motion.div` with `layoutId`) avoids any interaction with Framer Motion's internal ref system.
 
 - [ ] **Step 4: Verify the build**
 
@@ -434,21 +414,10 @@ import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronR
 
 - [ ] **Step 2: Add arrow buttons as siblings of the modal card**
 
-Find the positioning container:
+After Task 6, the outer container already has `{...swipeHandlers}`. The complete structure with arrow buttons added looks like this:
 
 ```tsx
-<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-    <motion.div
-        {...swipeHandlers}
-        layoutId={...}
-        ...
-    >
-```
-
-Add the arrow buttons before and after the `motion.div`:
-
-```tsx
-<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+<div {...swipeHandlers} className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
     <Button
         size="icon"
         variant="ghost"
@@ -461,11 +430,10 @@ Add the arrow buttons before and after the `motion.div`:
     </Button>
 
     <motion.div
-        {...swipeHandlers}
         layoutId={`wine-${openedForWineId.current}`}
         className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
     >
-        {/* existing modal content */}
+        {/* existing modal content — unchanged */}
     </motion.div>
 
     <Button
