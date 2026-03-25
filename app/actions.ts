@@ -184,3 +184,63 @@ export async function getWines() {
         },
     });
 }
+
+export async function getUserProfile(username: string) {
+    return await prisma.user.findUnique({
+        where: { username },
+        include: { wines: { orderBy: { createdAt: "desc" } } },
+    });
+}
+
+export async function getIsFollowing(userId: number): Promise<boolean> {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return false;
+    const follow = await prisma.follow.findUnique({
+        where: {
+            followerId_followingId: {
+                followerId: currentUser.id,
+                followingId: userId,
+            },
+        },
+    });
+    return follow !== null;
+}
+
+export async function followUser(userId: number) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+    if (currentUser.id === userId) throw new Error("Cannot follow yourself");
+    try {
+        await prisma.follow.create({
+            data: { followerId: currentUser.id, followingId: userId },
+        });
+    } catch {
+        // Duplicate follow — unique constraint violation, treat as no-op
+    }
+    revalidatePath("/");
+}
+
+export async function unfollowUser(userId: number) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+    await prisma.follow.deleteMany({
+        where: { followerId: currentUser.id, followingId: userId },
+    });
+    revalidatePath("/");
+}
+
+export async function getFollowingFeed() {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return [];
+    const follows = await prisma.follow.findMany({
+        where: { followerId: currentUser.id },
+        select: { followingId: true },
+    });
+    const followingIds = follows.map((f) => f.followingId);
+    if (followingIds.length === 0) return [];
+    return await prisma.wine.findMany({
+        where: { userId: { in: followingIds } },
+        include: { user: { select: { username: true } } },
+        orderBy: { createdAt: "desc" },
+    });
+}
