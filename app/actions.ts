@@ -3,12 +3,13 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 import Anthropic from "@anthropic-ai/sdk";
+import { detectServerLang } from "@/lib/i18n";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ export async function analyzeWineImage(formData: FormData): Promise<{ name: stri
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
 
-    const lang = (await cookies()).get("lang")?.value ?? "en";
+    const lang = detectServerLang((await headers()).get("accept-language"));
     const langInstruction = lang === "fr" ? "Réponds en français." : "Respond in English.";
 
     const image = formData.get("image") as File;
