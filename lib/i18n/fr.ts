@@ -36,6 +36,8 @@ export const fr = {
     tastingNotes: "Notes de dégustation",
     deleteConfirm: "Supprimer ce vin ?",
     deleteConfirmAction: "Oui, supprimer",
+    deleting: "Suppression…",
+    deleteFailed: "Échec de la suppression",
   },
   wineGrid: {
     emptyTitle: "Aucun vin ajouté pour l'instant.",

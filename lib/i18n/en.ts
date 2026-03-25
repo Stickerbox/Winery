@@ -34,6 +34,8 @@ export const en = {
     tastingNotes: "Tasting Notes",
     deleteConfirm: "Delete this wine?",
     deleteConfirmAction: "Yes, delete",
+    deleting: "Deleting…",
+    deleteFailed: "Failed to delete wine",
   },
   wineGrid: {
     emptyTitle: "No wines added yet.",

@@ -19,6 +19,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
     const [confirmingDelete, setConfirmingDelete] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
+    const [deleteError, setDeleteError] = React.useState<string | null>(null);
     const { t, lang } = useTranslations();
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
@@ -27,6 +28,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === "Escape" && !deleting) {
                 setConfirmingDelete(false);
+                setDeleteError(null);
             }
         }
         document.addEventListener("keydown", handleKeyDown);
@@ -39,6 +41,8 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
             await deleteWine(wine.id);
             onClose();
             onDelete?.();
+        } catch {
+            setDeleteError(t.wineModal.deleteFailed);
         } finally {
             setDeleting(false);
         }
@@ -109,7 +113,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                     href={saqUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 mt-1 text-sm text-violet-600 dark:text-violet-400 hover:underline"
+                                    className="flex items-center gap-1 mt-1 text-sm text-violet-600 dark:text-violet-400 hover:underline"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <ExternalLink className="h-3 w-3" />
@@ -183,7 +187,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/40 z-[60]"
                             onClick={() => {
-                                if (!deleting) setConfirmingDelete(false);
+                                if (!deleting) { setConfirmingDelete(false); setDeleteError(null); }
                             }}
                         />
                         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none">
@@ -195,13 +199,16 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                 transition={{ duration: 0.15 }}
                                 className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl pointer-events-auto"
                             >
-                                <p className="text-zinc-900 dark:text-white font-semibold text-lg mb-6">
+                                <p className="text-zinc-900 dark:text-white font-semibold text-lg mb-2">
                                     {t.wineModal.deleteConfirm}
                                 </p>
+                                {deleteError && (
+                                    <p className="text-red-500 text-sm mb-4">{deleteError}</p>
+                                )}
                                 <div className="flex gap-3 justify-end">
                                     <Button
                                         variant="ghost"
-                                        onClick={() => setConfirmingDelete(false)}
+                                        onClick={() => { if (!deleting) { setConfirmingDelete(false); setDeleteError(null); } }}
                                         disabled={deleting}
                                     >
                                         {t.common.cancel}
@@ -211,7 +218,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                                         onClick={handleDelete}
                                         disabled={deleting}
                                     >
-                                        {deleting ? "..." : t.wineModal.deleteConfirmAction}
+                                        {deleting ? t.wineModal.deleting : t.wineModal.deleteConfirmAction}
                                     </Button>
                                 </div>
                             </motion.div>
