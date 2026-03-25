@@ -7,7 +7,6 @@ import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
 import { Button } from "@/components/ui/Button";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/auth-actions";
@@ -158,10 +157,6 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                 )}
                 {activeTab === "following" && <FollowingFeed wines={feedWines} />}
                 {activeTab === "wishlist" && null}
-
-                <div className="flex justify-center pb-6">
-                    <LanguageToggle />
-                </div>
             </main>
 
             {/* Add Wine Modal */}
