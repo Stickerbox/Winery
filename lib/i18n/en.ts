@@ -37,6 +37,8 @@ export const en = {
     deleting: "Deleting…",
     deleteFailed: "Failed to delete wine",
     goToSAQ: "Go to SAQ",
+    prevWine: "Previous wine",
+    nextWine: "Next wine",
   },
   wineGrid: {
     emptyTitle: "No wines added yet.",

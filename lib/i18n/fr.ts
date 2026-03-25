@@ -39,6 +39,8 @@ export const fr = {
     deleting: "Suppression…",
     deleteFailed: "Échec de la suppression",
     goToSAQ: "Aller sur SAQ",
+    prevWine: "Vin précédent",
+    nextWine: "Vin suivant",
   },
   wineGrid: {
     emptyTitle: "Aucun vin ajouté pour l'instant.",
