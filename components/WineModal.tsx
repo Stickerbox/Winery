@@ -8,6 +8,7 @@ import { RatingStar } from "@/components/ui/RatingStar";
 import { motion, AnimatePresence } from "framer-motion";
 import { deleteWine, generateShareToken } from "@/app/actions";
 import { useTranslations } from "@/components/LanguageContext";
+import { useSwipeable } from "react-swipeable";
 
 interface WineModalProps {
     wine: Wine;
@@ -26,6 +27,11 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
     const [deleteError, setDeleteError] = React.useState<string | null>(null);
     const { t, lang } = useTranslations();
     const openedForWineId = React.useRef(wine.id);
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: () => { if (hasNext && !confirmingDelete) onNext(); },
+        onSwipedRight: () => { if (hasPrev && !confirmingDelete) onPrev(); },
+        preventScrollOnSwipe: true,
+    });
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
     React.useEffect(() => {
@@ -89,7 +95,7 @@ export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, o
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
                 onClick={confirmingDelete ? undefined : onClose}
             />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div {...swipeHandlers} className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
                 <motion.div
                     layoutId={`wine-${openedForWineId.current}`}
                     className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col md:flex-row max-h-[90vh]"
