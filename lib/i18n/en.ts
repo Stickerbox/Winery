@@ -16,6 +16,9 @@ export const en = {
     searchTitle: "Search",
     logoutTitle: "Logout",
     addWineTitle: "Add Wine",
+    tabCollection: "Collection",
+    tabFollowing: "Following",
+    tabWishlist: "Wishlist",
   },
   wineForm: {
     takePhoto: "Take a photo of your wine",
@@ -55,5 +58,14 @@ export const en = {
     viewCollection: "View your collection",
     addToMine: "Add to my wines",
     loginToAdd: "Log in to add to your wines",
+  },
+  profile: {
+    follow: "Follow",
+    unfollow: "Unfollow",
+    wineCount: "{count} wines",
+  },
+  feed: {
+    empty: "Follow some users to see their wines here.",
+    by: "by {username}",
   },
 };
