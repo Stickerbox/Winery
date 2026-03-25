@@ -66,8 +66,8 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
     );
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-36 sm:pb-20">
-            <header className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex flex-col gap-2">
+        <div className="min-h-screen pb-36 sm:pb-20">
+            <header className="sticky top-0 z-10 bg-white/30 dark:bg-white/10 backdrop-blur-xl border-b border-white/30 dark:border-white/20 px-4 py-3 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
@@ -81,7 +81,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                            className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                            className="rounded-lg border border-white/30 dark:border-white/20 bg-white/30 dark:bg-white/10 px-2 py-1.5 text-xs text-zinc-700 dark:text-white/80 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
                         >
                             <option value="newest">{t.dashboard.sortNewest}</option>
                             <option value="oldest">{t.dashboard.sortOldest}</option>
@@ -119,7 +119,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={t.dashboard.searchPlaceholder}
-                                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full rounded-lg border border-white/30 dark:border-white/20 bg-white/30 dark:bg-white/10 px-3 py-1.5 text-sm text-zinc-700 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-zinc-400 dark:placeholder:text-white/40"
                             />
                         </motion.div>
                     )}
@@ -127,7 +127,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
             </header>
 
             <main className="container mx-auto max-w-7xl">
-                <div className="hidden sm:flex border-b border-zinc-200 dark:border-zinc-800 px-4">
+                <div className="hidden sm:flex border-b border-white/20 dark:border-white/15 px-4">
                     {(["collection", "following", "wishlist"] as const).map((tab) => (
                         <button
                             key={tab}
@@ -137,7 +137,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                                 "px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                                 activeTab === tab
                                     ? "border-violet-600 text-violet-600"
-                                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white"
                             )}
                         >
                             {tab === "collection"
@@ -216,7 +216,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
             </AnimatePresence>
 
             {/* Mobile Bottom Nav */}
-            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-4 z-20 flex sm:hidden items-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-[0_0_16px_0_rgba(0,0,0,0.10)] p-2">
+            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-4 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-3xl shadow-[var(--glass-shadow)] p-2">
                 {(["collection", "following", "wishlist"] as const).map((tab) => (
                     <button
                         key={tab}
@@ -225,7 +225,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                         className={cn(
                             "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs font-medium transition-colors",
                             activeTab === tab
-                                ? "bg-violet-100 dark:bg-violet-900/40 text-violet-600"
+                                ? "bg-white/30 dark:bg-white/20 text-violet-600 dark:text-violet-400"
                                 : "text-zinc-500"
                         )}
                     >
