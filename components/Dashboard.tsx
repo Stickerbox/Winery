@@ -14,7 +14,7 @@ import { logout } from "@/app/auth-actions";
 import { useTranslations } from "@/components/LanguageContext";
 import { FollowingFeed } from "@/components/FollowingFeed";
 
-type FeedWine = import("@prisma/client").Wine & { user: { username: string } };
+type FeedWine = Wine & { user: { username: string } };
 
 interface DashboardProps {
     wines: Wine[];
