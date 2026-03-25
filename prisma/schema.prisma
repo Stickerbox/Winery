@@ -15,6 +15,8 @@ model User {
   username  String   @unique
   createdAt DateTime @default(now())
   wines     Wine[]
+  following Follow[] @relation("UserFollowers")
+  followers Follow[] @relation("UserFollowing")
 }
 
 model Wine {
@@ -28,4 +30,15 @@ model Wine {
   user             User     @relation(fields: [userId], references: [id])
   shareToken       String?  @unique
   sharedByUsername String?
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }
