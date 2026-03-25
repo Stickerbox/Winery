@@ -404,9 +404,11 @@ git commit -m "feat: add profile and feed i18n keys (fr)"
 **Files:**
 - Modify: `components/WineModal.tsx`
 
-- [ ] **Step 1: Add `readonly` to the props interface**
+- [ ] **Step 1: Add `readonly` prop and make navigation props optional**
 
-Find the `WineModalProps` interface (lines 12–16). Change it to:
+The user recently added navigation to `WineModal` — it now has required `hasPrev`, `hasNext`, `onPrev`, `onNext` props. These need to become optional so readonly callers (ProfileView, FollowingFeed) don't need to wire up navigation.
+
+Find the `WineModalProps` interface. Replace it with:
 
 ```ts
 interface WineModalProps {
@@ -414,19 +416,28 @@ interface WineModalProps {
     onClose: () => void;
     onDelete?: () => void;
     readonly?: boolean;
+    hasPrev?: boolean;
+    hasNext?: boolean;
+    onPrev?: () => void;
+    onNext?: () => void;
 }
 ```
 
-- [ ] **Step 2: Destructure `readonly` in the component**
+- [ ] **Step 2: Update the component destructuring with defaults**
 
-Find line 18:
-```ts
-export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
-```
+Find the `export function WineModal(...)` line. Change it to:
 
-Change to:
 ```ts
-export function WineModal({ wine, onClose, onDelete, readonly = false }: WineModalProps) {
+export function WineModal({
+    wine,
+    onClose,
+    onDelete,
+    readonly = false,
+    hasPrev = false,
+    hasNext = false,
+    onPrev = () => {},
+    onNext = () => {},
+}: WineModalProps) {
 ```
 
 - [ ] **Step 3: Wrap the footer div in a conditional**
