@@ -35,9 +35,13 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
 
     async function handleDelete() {
         setDeleting(true);
-        await deleteWine(wine.id);
-        onClose();
-        onDelete?.();
+        try {
+            await deleteWine(wine.id);
+            onClose();
+            onDelete?.();
+        } finally {
+            setDeleting(false);
+        }
     }
 
     async function handleShare() {
