@@ -67,7 +67,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
     );
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-20">
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-36 sm:pb-20">
             <header className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -200,7 +200,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
             {/* Floating Add Button */}
             <button
                 onClick={() => setIsAddOpen(true)}
-                className="fixed bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
+                className="fixed bottom-24 sm:bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
                 title={t.dashboard.addWineTitle}
             >
                 <Plus className="h-6 w-6" />
