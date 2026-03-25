@@ -5,7 +5,7 @@ import { Wine } from "@prisma/client";
 import { X, Calendar, Trash2, Share2, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { deleteWine, generateShareToken } from "@/app/actions";
 import { useTranslations } from "@/components/LanguageContext";
 
@@ -17,10 +17,24 @@ interface WineModalProps {
 
 export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
+    const [confirmingDelete, setConfirmingDelete] = React.useState(false);
+    const [deleting, setDeleting] = React.useState(false);
     const { t, lang } = useTranslations();
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
 
+    React.useEffect(() => {
+        if (!confirmingDelete) return;
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === "Escape" && !deleting) {
+                setConfirmingDelete(false);
+            }
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [confirmingDelete, deleting]);
+
     async function handleDelete() {
+        setDeleting(true);
         await deleteWine(wine.id);
         onClose();
         onDelete?.();
@@ -49,7 +63,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-                onClick={onClose}
+                onClick={confirmingDelete ? undefined : onClose}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
                 <motion.div
@@ -138,7 +152,7 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                             <Button
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
-                                onClick={handleDelete}
+                                onClick={() => setConfirmingDelete(true)}
                             >
                                 <Trash2 className="h-4 w-4" />
                                 {t.common.delete}
@@ -155,6 +169,52 @@ export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
                     </div>
                 </motion.div>
             </div>
+            <AnimatePresence>
+                {confirmingDelete && (
+                    <>
+                        <motion.div
+                            key="confirm-backdrop"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/40 z-[60]"
+                            onClick={() => {
+                                if (!deleting) setConfirmingDelete(false);
+                            }}
+                        />
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none">
+                            <motion.div
+                                key="confirm-card"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.15 }}
+                                className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl pointer-events-auto"
+                            >
+                                <p className="text-zinc-900 dark:text-white font-semibold text-lg mb-6">
+                                    {t.wineModal.deleteConfirm}
+                                </p>
+                                <div className="flex gap-3 justify-end">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => setConfirmingDelete(false)}
+                                        disabled={deleting}
+                                    >
+                                        {t.common.cancel}
+                                    </Button>
+                                    <Button
+                                        className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                                        onClick={handleDelete}
+                                        disabled={deleting}
+                                    >
+                                        {deleting ? "..." : t.wineModal.deleteConfirmAction}
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </>
+                )}
+            </AnimatePresence>
         </>
     );
 }
