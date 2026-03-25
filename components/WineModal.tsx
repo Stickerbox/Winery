@@ -13,9 +13,13 @@ interface WineModalProps {
     wine: Wine;
     onClose: () => void;
     onDelete?: () => void;
+    hasPrev: boolean;
+    hasNext: boolean;
+    onPrev: () => void;
+    onNext: () => void;
 }
 
-export function WineModal({ wine, onClose, onDelete }: WineModalProps) {
+export function WineModal({ wine, onClose, onDelete, hasPrev, hasNext, onPrev, onNext }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
     const [confirmingDelete, setConfirmingDelete] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
