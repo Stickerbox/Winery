@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
+import { detectServerLang } from "@/lib/i18n";
 import { LanguageProvider } from "@/components/LanguageContext";
 
 const geistSans = Geist({
@@ -24,7 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const lang = (await cookies()).get("lang")?.value ?? "en";
+  const lang = detectServerLang((await headers()).get("accept-language"));
 
   return (
     <html lang={lang}>

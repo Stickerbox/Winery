@@ -1,18 +1,16 @@
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { getCurrentUser } from "@/app/auth-actions";
 import { addSharedWine } from "@/app/actions";
-import { getT } from "@/lib/i18n";
-import { LanguageToggle } from "@/components/LanguageToggle";
+import { getT, detectServerLang } from "@/lib/i18n";
 
 const prisma = new PrismaClient();
 
 export default async function SharePage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params;
-    const cookieStore = await cookies();
-    const lang = cookieStore.get("lang")?.value ?? "en";
+    const lang = detectServerLang((await headers()).get("accept-language"));
 
     const [wine, user] = await Promise.all([
         prisma.wine.findUnique({
@@ -84,7 +82,6 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
                     )}
                 </div>
             </div>
-            <LanguageToggle />
         </div>
     );
 }

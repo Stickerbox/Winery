@@ -1,15 +1,14 @@
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { login } from "@/app/auth-actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { getT } from "@/lib/i18n";
-import { LanguageToggle } from "@/components/LanguageToggle";
+import { getT, detectServerLang } from "@/lib/i18n";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ redirect?: string }> }) {
     const { redirect } = await searchParams;
     const loginWithRedirect = login.bind(null, redirect ?? "/");
-    const lang = (await cookies()).get("lang")?.value ?? "en";
+    const lang = detectServerLang((await headers()).get("accept-language"));
     const t = getT(lang);
 
     return (
@@ -39,7 +38,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                     </form>
                 </CardContent>
             </Card>
-            <LanguageToggle />
         </div>
     );
 }
