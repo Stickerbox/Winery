@@ -1,8 +1,6 @@
 import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { getCurrentUser } from "@/app/auth-actions";
 import { addSharedWine } from "@/app/actions";
@@ -31,11 +29,11 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
         <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-4">
             <div className="w-full max-w-sm bg-white/65 dark:bg-white/15 backdrop-blur-lg border border-white/50 dark:border-white/20 rounded-2xl overflow-hidden shadow-[var(--glass-shadow)]">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/10">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                         src={wine.imagePath}
                         alt={wine.name}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -60,12 +58,13 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
 
                 <div className="px-5 pb-5">
                     {isOwnWine ? (
-                        <Link
+                        // eslint-disable-next-line @next/next/no-html-link-for-pages
+                        <a
                             href="/"
                             className="block w-full text-center text-sm font-medium py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 transition-opacity"
                         >
                             {t.share.viewCollection}
-                        </Link>
+                        </a>
                     ) : user ? (
                         <form action={addSharedWine.bind(null, token)}>
                             <button
