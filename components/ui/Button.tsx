@@ -55,9 +55,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         const premiumVariants = {
             default: "bg-violet-600 text-white hover:bg-violet-700 shadow-md shadow-violet-200 dark:shadow-none",
             destructive: "bg-red-500 text-white hover:bg-red-600",
-            outline: "border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:text-zinc-50",
+            outline: "border border-white/40 dark:border-white/25 bg-white/20 dark:bg-white/10 hover:bg-white/35 dark:hover:bg-white/20 text-zinc-900 dark:text-white",
             secondary: "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
-            ghost: "hover:bg-zinc-100 text-zinc-900 dark:hover:bg-zinc-800 dark:text-zinc-50",
+            ghost: "hover:bg-white/20 dark:hover:bg-white/15 text-zinc-900 dark:text-white",
             link: "text-violet-600 underline-offset-4 hover:underline",
         };
 
