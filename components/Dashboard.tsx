@@ -12,18 +12,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/auth-actions";
 import { useTranslations } from "@/components/LanguageContext";
+import { FollowingFeed } from "@/components/FollowingFeed";
+
+type FeedWine = import("@prisma/client").Wine & { user: { username: string } };
 
 interface DashboardProps {
     wines: Wine[];
     user: User;
+    feedWines: FeedWine[];
 }
 
-export function Dashboard({ wines, user }: DashboardProps) {
+export function Dashboard({ wines, user, feedWines }: DashboardProps) {
     const [isAddOpen, setIsAddOpen] = React.useState(false);
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
     const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "rating-high" | "rating-low">("newest");
+    const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist">("collection");
     const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
 
@@ -123,10 +128,38 @@ export function Dashboard({ wines, user }: DashboardProps) {
             </header>
 
             <main className="container mx-auto max-w-7xl">
-                <WineGrid
-                    wines={filteredWines}
-                    onWineClick={(wine) => setSelectedWine(wine)}
-                />
+                <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-4">
+                    {(["collection", "following", "wishlist"] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => tab !== "wishlist" && setActiveTab(tab)}
+                            disabled={tab === "wishlist"}
+                            className={cn(
+                                "px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+                                activeTab === tab
+                                    ? "border-violet-600 text-violet-600"
+                                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100",
+                                tab === "wishlist" && "opacity-40 cursor-not-allowed"
+                            )}
+                        >
+                            {tab === "collection"
+                                ? t.dashboard.tabCollection
+                                : tab === "following"
+                                ? t.dashboard.tabFollowing
+                                : t.dashboard.tabWishlist}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === "collection" && (
+                    <WineGrid
+                        wines={filteredWines}
+                        onWineClick={(wine) => setSelectedWine(wine)}
+                    />
+                )}
+                {activeTab === "following" && <FollowingFeed wines={feedWines} />}
+                {activeTab === "wishlist" && null}
+
                 <div className="flex justify-center pb-6">
                     <LanguageToggle />
                 </div>
