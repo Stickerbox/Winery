@@ -133,6 +133,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
+                            aria-current={activeTab === tab ? "true" : undefined}
                             className={cn(
                                 "px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                                 activeTab === tab
@@ -225,7 +226,7 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        aria-current={activeTab === tab ? "page" : undefined}
+                        aria-current={activeTab === tab ? "true" : undefined}
                         className={cn(
                             "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs font-medium transition-colors",
                             activeTab === tab
@@ -233,9 +234,9 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                                 : "text-zinc-500"
                         )}
                     >
-                        {tab === "collection" && <WineIcon className="h-5 w-5" />}
-                        {tab === "following" && <Users className="h-5 w-5" />}
-                        {tab === "wishlist" && <Bookmark className="h-5 w-5" />}
+                        {tab === "collection" && <WineIcon className="h-5 w-5" aria-hidden="true" />}
+                        {tab === "following" && <Users className="h-5 w-5" aria-hidden="true" />}
+                        {tab === "wishlist" && <Bookmark className="h-5 w-5" aria-hidden="true" />}
                         <span>
                             {tab === "collection"
                                 ? t.dashboard.tabCollection
