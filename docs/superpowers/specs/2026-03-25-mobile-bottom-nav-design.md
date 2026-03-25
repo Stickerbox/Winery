@@ -19,9 +19,9 @@ The existing tab bar stays as-is — full-width underline style rendered at the 
 
 **Positioning:** `fixed bottom-4 left-4 right-4` — spans full viewport width minus 16px padding on each side.
 
-**Shape:** `rounded-2xl` — floating pill/card appearance, not full-width edge-to-edge.
+**Shape:** `rounded-3xl` — floating pill appearance, not full-width edge-to-edge.
 
-**Style:** Frosted-glass matching the app header: `bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 shadow-lg`.
+**Style:** Frosted-glass matching the app header: `bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 shadow-lg`. There should be a soft shadow that is even (i.e. has no direction, not more shadow on the bottom than top).
 
 **Visibility:** `flex sm:hidden` — only visible on mobile.
 
