@@ -198,6 +198,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                     className="w-full"
                                     disabled={
                                         isPending ||
+                                        !compressedFileRef.current ||
                                         !name.trim() ||
                                         !description.trim() ||
                                         (mode !== "wishlist" && rating === 0)
