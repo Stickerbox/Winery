@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark, Check, Link as LinkIcon } from "lucide-react";
+import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark, Share2 } from "lucide-react";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
@@ -33,22 +33,19 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist">("collection");
     const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
-    const [copied, setCopied] = React.useState(false);
 
     const wishlistedKeys = React.useMemo(
         () => new Set(wishlistItems.map((i) => `${i.name}::${i.addedByUsername}`)),
         [wishlistItems]
     );
 
-    function handleCopyProfileLink() {
-        if (!navigator.clipboard) return;
+    function handleShareProfile() {
         const url = `${window.location.origin}/u/${user.username}`;
-        navigator.clipboard.writeText(url).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }).catch(() => {
-            // Clipboard unavailable — no-op; button stays in default state
-        });
+        if (navigator.share) {
+            navigator.share({ title: user.username, url }).catch(() => {});
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).catch(() => {});
+        }
     }
 
     const filteredWines = React.useMemo(() => {
@@ -116,15 +113,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             title={t.dashboard.searchTitle}
                         >
                             {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={handleCopyProfileLink}
-                            title={t.dashboard.shareTitle}
-                        >
-                            {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
                         </Button>
                         <form action={logout}>
                             <Button variant="ghost" size="icon" className="rounded-full" title={t.dashboard.logoutTitle}>
