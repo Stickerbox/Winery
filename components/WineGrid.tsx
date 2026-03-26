@@ -4,7 +4,6 @@ import * as React from "react";
 import { Wine } from "@prisma/client";
 import { WineCard } from "@/components/WineCard";
 import { useTranslations } from "@/components/LanguageContext";
-import { motion } from "framer-motion";
 import { groupWinesByMonth } from "@/lib/utils";
 
 interface WineGridProps {
@@ -36,13 +35,13 @@ export function WineGrid({ wines, onWineClick, readonly }: WineGridProps) {
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 pb-4">
                         {groupWines.map((wine) => (
-                            <motion.div key={wine.id}>
+                            <div key={wine.id}>
                                 <WineCard
                                     wine={wine}
                                     onClick={() => onWineClick(wine)}
                                     readonly={readonly}
                                 />
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </div>

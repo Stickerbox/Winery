@@ -59,11 +59,12 @@ export function FollowingFeed({ wines, wishlistItems }: FollowingFeedProps) {
                 pendingKeys.current.delete(key);
             }
         } else {
+            const removedItem = localWishlistItems.find((i) => i.id === existingId)!;
             setLocalWishlistItems((prev) => prev.filter((i) => i.id !== existingId));
             try {
                 await removeFromWishlist(existingId);
             } catch {
-                setLocalWishlistItems(wishlistItems);
+                setLocalWishlistItems((prev) => [...prev, removedItem]);
             } finally {
                 pendingKeys.current.delete(key);
             }
