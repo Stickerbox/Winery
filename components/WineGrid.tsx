@@ -5,6 +5,7 @@ import { Wine } from "@prisma/client";
 import { WineCard } from "@/components/WineCard";
 import { useTranslations } from "@/components/LanguageContext";
 import { motion } from "framer-motion";
+import { groupWinesByMonth } from "@/lib/utils";
 
 interface WineGridProps {
     wines: Wine[];
@@ -13,7 +14,7 @@ interface WineGridProps {
 }
 
 export function WineGrid({ wines, onWineClick, readonly }: WineGridProps) {
-    const { t } = useTranslations();
+    const { t, lang } = useTranslations();
 
     if (wines.length === 0) {
         return (
@@ -24,11 +25,28 @@ export function WineGrid({ wines, onWineClick, readonly }: WineGridProps) {
         );
     }
 
+    const groups = groupWinesByMonth(wines, lang);
+
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-            {wines.map((wine) => (
-                <WineCard key={wine.id} wine={wine} onClick={() => onWineClick(wine)} readonly={readonly} />
+        <>
+            {groups.map(({ label, wines: groupWines }) => (
+                <div key={label}>
+                    <h2 className="text-2xl font-bold text-zinc-400 dark:text-zinc-500 px-4 pt-6 pb-2">
+                        {label}
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 pb-4">
+                        {groupWines.map((wine) => (
+                            <motion.div key={wine.id}>
+                                <WineCard
+                                    wine={wine}
+                                    onClick={() => onWineClick(wine)}
+                                    readonly={readonly}
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
             ))}
-        </div>
+        </>
     );
 }
