@@ -24,6 +24,15 @@ interface DashboardProps {
     wishlistItems: WishlistItem[];
 }
 
+const PickerPill = ({ emoji, label, onClick }: { emoji: string; label: string; onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
+    >
+        <span aria-hidden="true">{emoji}</span> {label}
+    </button>
+);
+
 export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardProps) {
     const [isPickerOpen, setIsPickerOpen] = React.useState(false);
     const [addMode, setAddMode] = React.useState<"collection" | "wishlist" | null>(null);
@@ -85,15 +94,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const selectedIndex = React.useMemo(
         () => (selectedWine ? filteredWines.findIndex((w) => w.id === selectedWine.id) : -1),
         [filteredWines, selectedWine]
-    );
-
-    const PickerPill = ({ emoji, label, onClick }: { emoji: string; label: string; onClick: () => void }) => (
-        <button
-            onClick={onClick}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
-        >
-            <span aria-hidden="true">{emoji}</span> {label}
-        </button>
     );
 
     return (
