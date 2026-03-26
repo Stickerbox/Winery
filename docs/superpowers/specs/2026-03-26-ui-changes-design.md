@@ -10,19 +10,44 @@ Five focused UI improvements across the FollowingFeed, WishlistGrid, ProfileView
 
 ---
 
-## 1. "Add to Wishlist" Pill on Image
+## 1. "Add to Wishlist" Pill on WineModal Image
 
-**File:** `components/FollowingFeed.tsx`
+**Files:** `components/WineModal.tsx`, `components/FollowingFeed.tsx`, `components/ProfileView.tsx`, profile page server component
 
-**Change:** Move the wishlist bookmark button from below the `WineCard` to an always-visible pill overlaid at the bottom-center of the card image.
+**Change:** When viewing another user's wine in the modal, show a pill at the bottom-center of the image panel to add/remove from wishlist. No changes to the card grid in FollowingFeed.
 
-**Implementation:**
-- Wrap the `<WineCard>` in a `relative` container div
-- Add an absolutely-positioned pill at `bottom-2 left-1/2 -translate-x-1/2`
-- Pill styles: `px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm text-white text-xs flex items-center gap-1.5 whitespace-nowrap`
-- Contents: `<Bookmark>` icon (h-3.5 w-3.5) + "Wishlist" label
-- When wishlisted: icon fills (`fill-current`), pill background shifts to `bg-violet-600/60`
-- Remove the existing below-card wishlist button row; keep only the `by {username}` attribution line below the card
+### WineModal prop additions
+Add two optional props:
+- `isWishlisted?: boolean`
+- `onWishlistToggle?: () => void`
+
+The pill renders only when **both** `readonly=true` and `onWishlistToggle` is provided.
+
+**Pill position:** absolutely positioned within the image `<div>`, `bottom-4 left-1/2 -translate-x-1/2`
+
+**Pill styles:**
+- Not wishlisted: `px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm text-white text-sm flex items-center gap-1.5 whitespace-nowrap hover:bg-black/60 transition-colors`
+- Contents: `<Plus>` icon (h-4 w-4) + `t.wishlist.addToWishlist`
+- Wishlisted: background shifts to `bg-violet-600/70`, contents: `<Check>` icon + `t.wishlist.removeFromWishlist`
+
+**Translation keys used:** `t.wishlist.addToWishlist`, `t.wishlist.removeFromWishlist` — both already exist. Update `removeFromWishlist` in both locale files from the terse "Remove" / "Supprimer" to a full label:
+- `en`: `"Remove from Wishlist"`
+- `fr`: `"Retirer de la liste de souhaits"`
+
+### FollowingFeed wiring
+`FollowingFeed` already manages `localWishlisted` state and `handleWishlist(wine)`. When opening the modal, pass:
+- `isWishlisted={localWishlisted.has(key)}`
+- `onWishlistToggle={() => handleWishlist(wine)}`
+
+Keep the existing below-card attribution line (`by {username}`). Remove the below-card bookmark icon button since the action moves into the modal.
+
+### ProfileView wiring
+`ProfileView` currently receives no wishlist data. Changes needed:
+- Profile page server component fetches `wishlistItems` for the current user (same query used in Dashboard) and passes them to `ProfileView`
+- `ProfileView` accepts a new `wishlistItems: WishlistItem[]` prop (optional, empty array default)
+- Computes `wishlistedKeys` set from that prop
+- Passes `isWishlisted` and `onWishlistToggle` (calling `addToWishlist` / `removeFromWishlist`) to `WineModal`
+- If `currentUserId === null` (logged-out visitor), omit both props so no pill appears
 
 ---
 
@@ -101,22 +126,25 @@ Add to `lib/utils.ts`:
 
 ```ts
 export function groupWinesByMonth<T extends { createdAt: Date | string }>(
-  wines: T[]
+  wines: T[],
+  locale: string
 ): { label: string; wines: T[] }[]
 ```
 
-- Groups wines into buckets by `MMMM YYYY` label (e.g. "March 2026")
+- Groups wines into buckets keyed by `YYYY-MM` for sorting, with a locale-aware display label generated via `new Date(...).toLocaleDateString(locale, { month: 'long', year: 'numeric' })` — e.g. "March 2026" in English, "mars 2026" in French
+- Accepts a `locale` string (pass the `lang` value from `useTranslations()` — `"en"` or `"fr"`)
 - Sorts buckets newest-first (most recent month at top)
 - Wines within each bucket retain their existing order
 
 ### 5b. `WineGrid` — grouped rendering
-- Replace the flat `wines.map(...)` with a loop over `groupWinesByMonth(wines)`
+- Accept `lang` via `useTranslations()`
+- Replace the flat `wines.map(...)` with a loop over `groupWinesByMonth(wines, lang)`
 - Each group renders: a section header `<h2>` followed by a sub-grid
 - Section header style: `text-2xl font-bold text-zinc-400 dark:text-zinc-500 px-4 pt-6 pb-2`
 - Sub-grid uses the same `grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4` layout
 
 ### 5c. `FollowingFeed` — grouped rendering
-- Same grouping pattern applied to the `wines` array
+- Same grouping pattern applied to the `wines` array, passing `lang` from `useTranslations()`
 - Each group renders a section header then its wine cards (with the wishlist pill overlay per change #1)
 
 ### 5d. Profile page
@@ -135,3 +163,5 @@ export function groupWinesByMonth<T extends { createdAt: Date | string }>(
 | `components/WineGrid.tsx` | Date section headers |
 | `app/globals.css` | `background-attachment: fixed` |
 | `lib/utils.ts` | `groupWinesByMonth` utility |
+| `lib/i18n/en.ts` | Update `wishlist.removeFromWishlist` to full label |
+| `lib/i18n/fr.ts` | Update `wishlist.removeFromWishlist` to full French label |
