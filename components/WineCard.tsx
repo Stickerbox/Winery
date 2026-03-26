@@ -7,7 +7,7 @@ import { RatingStar } from "@/components/ui/RatingStar";
 import { motion } from "framer-motion";
 
 interface WineCardItem {
-    id: string;
+    id: number;
     imagePath: string | null;
     name: string;
     rating?: number;
