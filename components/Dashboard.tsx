@@ -233,14 +233,14 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
             </AnimatePresence>
 
             {/* Mobile Bottom Nav */}
-            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-4 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-3xl shadow-[var(--glass-shadow)] p-2">
+            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-20 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-3xl shadow-[var(--glass-shadow)] p-2">
                 {(["collection", "following", "wishlist"] as const).map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         aria-current={activeTab === tab ? "page" : undefined}
                         className={cn(
-                            "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-xs font-medium transition-colors",
+                            "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-full text-xs font-medium transition-colors",
                             activeTab === tab
                                 ? "bg-white/30 dark:bg-white/20 text-violet-600 dark:text-violet-400"
                                 : "text-zinc-500"
