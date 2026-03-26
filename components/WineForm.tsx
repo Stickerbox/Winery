@@ -15,13 +15,20 @@ import { useTranslations } from "@/components/LanguageContext";
 
 type Phase = "capture" | "analyzing" | "review";
 
-export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
+interface WineFormProps {
+    onSuccess?: () => void;
+    initialValues?: { name: string; description: string };
+    skipAnalysis?: boolean;
+    onSubmit?: (formData: FormData) => Promise<void>;
+}
+
+export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: WineFormProps) {
     const [isPending, startTransition] = React.useTransition();
-    const [phase, setPhase] = React.useState<Phase>("capture");
+    const [phase, setPhase] = React.useState<Phase>(initialValues ? "review" : "capture");
     const [rating, setRating] = React.useState(0);
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
-    const [name, setName] = React.useState("");
-    const [description, setDescription] = React.useState("");
+    const [name, setName] = React.useState(initialValues?.name ?? "");
+    const [description, setDescription] = React.useState(initialValues?.description ?? "");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
     const { t } = useTranslations();
@@ -45,17 +52,21 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
         dt.items.add(compressedFileRef.current);
         e.target.files = dt.files;
 
-        setPhase("analyzing");
-        try {
-            const fd = new FormData();
-            fd.append("image", compressedFileRef.current);
-            const result = await analyzeWineImage(fd);
-            setName(result.name);
-            setDescription(result.description);
-        } catch (err) {
-            console.error("Wine analysis failed:", err);
-        } finally {
+        if (skipAnalysis) {
             setPhase("review");
+        } else {
+            setPhase("analyzing");
+            try {
+                const fd = new FormData();
+                fd.append("image", compressedFileRef.current);
+                const result = await analyzeWineImage(fd);
+                setName(result.name);
+                setDescription(result.description);
+            } catch (err) {
+                console.error("Wine analysis failed:", err);
+            } finally {
+                setPhase("review");
+            }
         }
     };
 
@@ -68,12 +79,16 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
 
         startTransition(async () => {
             try {
-                await addWine(formData);
+                if (onSubmit) {
+                    await onSubmit(formData);
+                } else {
+                    await addWine(formData);
+                }
                 setRating(0);
                 setImagePreview(null);
-                setName("");
-                setDescription("");
-                setPhase("capture");
+                setName(initialValues?.name ?? "");
+                setDescription(initialValues?.description ?? "");
+                setPhase(initialValues ? "review" : "capture");
                 compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
                 onSuccess?.();
@@ -89,13 +104,13 @@ export function WineForm({ onSuccess }: { onSuccess?: () => void }) {
             <CardContent className="p-4">
                 <form action={handleSubmit} className="space-y-4">
                     <motion.div
-                        animate={{ height: phase === "capture" ? 240 : 144 }}
+                        animate={{ height: !imagePreview ? 240 : 144 }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         className={cn(
                             "relative w-full overflow-hidden rounded-xl",
                             !imagePreview && "border-2 border-dashed border-white/40 dark:border-white/35 bg-white/20 dark:bg-white/25 hover:bg-white/30 dark:hover:bg-white/35 transition-colors flex items-center justify-center cursor-pointer"
                         )}
-                        onClick={() => phase === "capture" && fileInputRef.current?.click()}
+                        onClick={() => !imagePreview && fileInputRef.current?.click()}
                     >
                         {imagePreview ? (
                             <>
