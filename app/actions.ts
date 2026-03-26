@@ -15,6 +15,26 @@ const prisma = new PrismaClient();
 
 import { getCurrentUser } from "./auth-actions";
 
+async function uploadWineImage(image: File): Promise<string> {
+    const buffer = Buffer.from(await image.arrayBuffer());
+    const filename = `${randomUUID()}.jpg`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+    try {
+        await fs.access(uploadDir);
+    } catch {
+        await fs.mkdir(uploadDir, { recursive: true });
+    }
+
+    const compressed = await sharp(buffer)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+
+    await fs.writeFile(path.join(uploadDir, filename), compressed);
+    return `/uploads/${filename}`;
+}
+
 export async function analyzeWineImage(formData: FormData): Promise<{ name: string; description: string }> {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
@@ -75,28 +95,8 @@ export async function addWine(formData: FormData) {
         throw new Error("Missing required fields");
     }
 
-    // Handle image upload
-    const buffer = Buffer.from(await image.arrayBuffer());
-    const filename = `${randomUUID()}.jpg`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    const imagePath = await uploadWineImage(image);
 
-    try {
-        await fs.access(uploadDir);
-    } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
-    }
-
-    const compressed = await sharp(buffer)
-        .resize({ width: 1200, withoutEnlargement: true })
-        .jpeg({ quality: 80 })
-        .toBuffer();
-
-    const filepath = path.join(uploadDir, filename);
-    await fs.writeFile(filepath, compressed);
-
-    const imagePath = `/uploads/${filename}`;
-
-    // Save to database
     await prisma.wine.create({
         data: {
             name,
@@ -106,6 +106,41 @@ export async function addWine(formData: FormData) {
             userId: user.id,
         },
     });
+
+    revalidatePath("/");
+}
+
+export async function addToWishlistManual(formData: FormData) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const image = formData.get("image") as File;
+
+    if (!name || !description || !image) {
+        throw new Error("Missing required fields");
+    }
+
+    const imagePath = await uploadWineImage(image);
+
+    try {
+        await prisma.wishlistItem.create({
+            data: {
+                userId: user.id,
+                name,
+                description,
+                imagePath,
+                addedByUsername: user.username,
+            },
+        });
+    } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+            // Already on wishlist — no-op
+            return;
+        }
+        throw e;
+    }
 
     revalidatePath("/");
 }
@@ -297,29 +332,11 @@ export async function moveToCollection(itemId: number, formData: FormData) {
         throw new Error("Missing required fields");
     }
 
-    // Write image first (outside transaction — same pattern as addWine)
-    const buffer = Buffer.from(await image.arrayBuffer());
-    const filename = `${randomUUID()}.jpg`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-    try {
-        await fs.access(uploadDir);
-    } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
-    }
-
-    const compressed = await sharp(buffer)
-        .resize({ width: 1200, withoutEnlargement: true })
-        .jpeg({ quality: 80 })
-        .toBuffer();
-
-    await fs.writeFile(path.join(uploadDir, filename), compressed);
     let imagePath: string | null = null;
 
     try {
-        imagePath = `/uploads/${filename}`;
+        imagePath = await uploadWineImage(image);
 
-        // Atomically create Wine + delete WishlistItem
         await prisma.$transaction([
             prisma.wine.create({
                 data: { name, description, rating, imagePath, userId: currentUser.id },
