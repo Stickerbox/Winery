@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { Card, CardContent } from "@/components/ui/Card";
 import imageCompression from "browser-image-compression";
-import { addWine, analyzeWineImage } from "@/app/actions";
+import { addWine, analyzeWineImage, addToWishlistManual } from "@/app/actions";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/components/LanguageContext";
@@ -20,9 +20,10 @@ interface WineFormProps {
     initialValues?: { name: string; description: string };
     skipAnalysis?: boolean;
     onSubmit?: (formData: FormData) => Promise<void>;
+    mode?: "collection" | "wishlist";
 }
 
-export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: WineFormProps) {
+export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mode = "collection" }: WineFormProps) {
     const [isPending, startTransition] = React.useTransition();
     const [phase, setPhase] = React.useState<Phase>(initialValues ? "review" : "capture");
     const [rating, setRating] = React.useState(0);
@@ -75,16 +76,20 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: W
             alert(t.wineForm.imageRequired);
             return;
         }
-        if (rating === 0) {
+        if (mode !== "wishlist" && rating === 0) {
             alert(t.wineForm.ratingRequired);
             return;
         }
-        formData.set("rating", rating.toString());
+        if (mode !== "wishlist") {
+            formData.set("rating", rating.toString());
+        }
 
         startTransition(async () => {
             try {
                 if (onSubmit) {
                     await onSubmit(formData);
+                } else if (mode === "wishlist") {
+                    await addToWishlistManual(formData);
                 } else {
                     await addWine(formData);
                 }
@@ -179,15 +184,28 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: W
                                     />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium leading-none">{t.wineForm.ratingLabel}</label>
-                                    <div className="flex justify-center py-1">
-                                        <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
+                                {mode !== "wishlist" && (
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium leading-none">{t.wineForm.ratingLabel}</label>
+                                        <div className="flex justify-center py-1">
+                                            <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
-                                <Button type="submit" className="w-full" disabled={isPending || rating === 0}>
-                                    {isPending ? t.wineForm.saving : t.wineForm.save}
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={
+                                        isPending ||
+                                        !name.trim() ||
+                                        !description.trim() ||
+                                        (mode !== "wishlist" && rating === 0)
+                                    }
+                                >
+                                    {mode === "wishlist"
+                                        ? isPending ? t.wineForm.savingWishlist : t.wineForm.saveWishlist
+                                        : isPending ? t.wineForm.saving : t.wineForm.save}
                                 </Button>
                             </motion.div>
                         )}
