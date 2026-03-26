@@ -9,6 +9,7 @@
 
 html {
   min-height: 100%;
+  background-color: #ede0f0;
 }
 
 html::before {
@@ -38,6 +39,9 @@ body {
     --foreground: #ededed;
     --glass-shadow: 0 8px 32px rgba(80,0,30,0.35);
     --glass-shadow-hover: 0 12px 40px rgba(80,0,30,0.5);
+  }
+  html {
+    background-color: #2d0a1e;
   }
   html::before {
     background: linear-gradient(135deg, #1a0a0f 0%, #2d0a1e 40%, #1e0d3a 100%);

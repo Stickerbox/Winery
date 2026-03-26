@@ -29,6 +29,10 @@ export default async function RootLayout({
 
   return (
     <html lang={lang}>
+      <head>
+        <meta name="theme-color" content="#ede0f0" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#2d0a1e" media="(prefers-color-scheme: dark)" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <LanguageProvider>
           {children}
