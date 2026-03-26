@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { WishlistItem } from "@prisma/client";
-import { Trash2, BookmarkPlus, X } from "lucide-react";
+import { Trash2, BookmarkPlus, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { removeFromWishlist, moveToCollection } from "@/app/actions";
 import { WineForm } from "@/components/WineForm";
+import { WishlistModal } from "@/components/WishlistModal";
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "@/components/LanguageContext";
 
@@ -15,6 +16,7 @@ interface WishlistGridProps {
 
 export function WishlistGrid({ items }: WishlistGridProps) {
     const [movingItem, setMovingItem] = React.useState<WishlistItem | null>(null);
+    const [selectedItem, setSelectedItem] = React.useState<WishlistItem | null>(null);
     const movingItemRef = React.useRef<WishlistItem | null>(null);
     const { t } = useTranslations();
 
@@ -35,7 +37,10 @@ export function WishlistGrid({ items }: WishlistGridProps) {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                 {items.map((item) => (
                     <div key={item.id} className="flex flex-col">
-                        <div className="relative rounded-xl overflow-hidden bg-white/10 border border-white/20 aspect-[4/5]">
+                        <div
+                            className="relative rounded-xl overflow-hidden bg-white/10 border border-white/20 aspect-[4/5] cursor-pointer"
+                            onClick={() => setSelectedItem(item)}
+                        >
                             {item.imagePath ? (
                                 <img
                                     src={item.imagePath}
@@ -55,14 +60,11 @@ export function WishlistGrid({ items }: WishlistGridProps) {
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 px-1">
                             {t.wishlist.by.replace("{username}", item.addedByUsername)}
                         </p>
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500 px-1 mt-0.5 line-clamp-2">
-                            {item.description}
-                        </p>
                         <div className="flex gap-2 mt-2">
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 h-8 w-8"
+                                className="rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 h-8 w-8 shrink-0"
                                 title={t.wishlist.removeFromWishlist}
                                 onClick={async () => {
                                     try {
@@ -74,20 +76,29 @@ export function WishlistGrid({ items }: WishlistGridProps) {
                             >
                                 <Trash2 className="h-3.5 w-3.5" />
                             </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="flex-1 text-xs h-8 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950"
+                            <button
+                                className="flex-1 rounded-full px-3 py-1.5 text-xs flex items-center justify-center gap-1.5 bg-violet-50 dark:bg-violet-950 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900 transition-colors"
                                 onClick={() => setMovingItem(item)}
                             >
+                                <Plus className="h-3.5 w-3.5" />
                                 {t.wishlist.moveToCollection}
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Move to Collection Modal — same pattern as Dashboard's add-wine modal */}
+            {/* Wishlist Item Detail Modal */}
+            <AnimatePresence>
+                {selectedItem && (
+                    <WishlistModal
+                        item={selectedItem}
+                        onClose={() => setSelectedItem(null)}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Move to Collection Modal */}
             <AnimatePresence>
                 {movingItem && (
                     <>
