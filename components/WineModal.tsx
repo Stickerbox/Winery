@@ -160,8 +160,8 @@ export function WineModal({
                                 className={cn(
                                     "absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-sm text-white text-sm flex items-center gap-1.5 whitespace-nowrap transition-colors",
                                     isWishlisted
-                                        ? "bg-violet-600/70 hover:bg-violet-700/70"
-                                        : "bg-black/40 hover:bg-black/60"
+                                        ? "bg-black/40 hover:bg-black/60"
+                                        : "bg-violet-600/70 hover:bg-violet-700/70"
                                 )}
                             >
                                 {isWishlisted ? (
