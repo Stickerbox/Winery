@@ -8,9 +8,10 @@ import { useTranslations } from "@/components/LanguageContext";
 interface FollowButtonProps {
     userId: number;
     initialIsFollowing: boolean;
+    className?: string;
 }
 
-export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) {
+export function FollowButton({ userId, initialIsFollowing, className }: FollowButtonProps) {
     const [isFollowing, setIsFollowing] = React.useState(initialIsFollowing);
     const [isPending, setIsPending] = React.useState(false);
     React.useEffect(() => {
@@ -41,6 +42,7 @@ export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) 
             onClick={handleClick}
             disabled={isPending}
             variant={isFollowing ? "ghost" : "default"}
+            className={className}
         >
             {isFollowing ? t.profile.unfollow : t.profile.follow}
         </Button>
