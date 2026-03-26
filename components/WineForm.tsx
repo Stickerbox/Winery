@@ -72,7 +72,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: W
 
     const handleSubmit = async (formData: FormData) => {
         if (!compressedFileRef.current) {
-            alert(t.wineForm.saveFailed);
+            alert(t.wineForm.imageRequired);
             return;
         }
         if (rating === 0) {

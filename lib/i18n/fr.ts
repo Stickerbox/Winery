@@ -35,6 +35,7 @@ export const fr = {
     save: "Sauvegarder dans la collection",
     ratingRequired: "Veuillez sélectionner une note",
     saveFailed: "Échec de l'ajout du vin",
+    imageRequired: "Veuillez d'abord prendre ou télécharger une photo",
   },
   wineModal: {
     tastingNotes: "Notes de dégustation",

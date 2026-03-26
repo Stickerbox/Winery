@@ -33,6 +33,7 @@ export const en = {
     save: "Save to Collection",
     ratingRequired: "Please select a rating",
     saveFailed: "Failed to add wine",
+    imageRequired: "Please take or upload a photo first",
   },
   wineModal: {
     tastingNotes: "Tasting Notes",
