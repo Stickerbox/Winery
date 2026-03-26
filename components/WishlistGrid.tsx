@@ -15,7 +15,12 @@ interface WishlistGridProps {
 
 export function WishlistGrid({ items }: WishlistGridProps) {
     const [movingItem, setMovingItem] = React.useState<WishlistItem | null>(null);
+    const movingItemRef = React.useRef<WishlistItem | null>(null);
     const { t } = useTranslations();
+
+    React.useEffect(() => {
+        movingItemRef.current = movingItem;
+    }, [movingItem]);
 
     if (items.length === 0) {
         return (
@@ -59,7 +64,13 @@ export function WishlistGrid({ items }: WishlistGridProps) {
                                 size="icon"
                                 className="rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 h-8 w-8"
                                 title={t.wishlist.removeFromWishlist}
-                                onClick={() => removeFromWishlist(item.id)}
+                                onClick={async () => {
+                                    try {
+                                        await removeFromWishlist(item.id);
+                                    } catch {
+                                        alert("Failed to remove from wishlist.");
+                                    }
+                                }}
                             >
                                 <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -106,7 +117,8 @@ export function WishlistGrid({ items }: WishlistGridProps) {
                                     initialValues={{ name: movingItem.name, description: movingItem.description }}
                                     skipAnalysis={true}
                                     onSubmit={async (formData) => {
-                                        await moveToCollection(movingItem.id, formData);
+                                        if (!movingItemRef.current) return;
+                                        await moveToCollection(movingItemRef.current.id, formData);
                                     }}
                                     onSuccess={() => setMovingItem(null)}
                                 />
