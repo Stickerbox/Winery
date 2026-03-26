@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   description: "Your personal wine collection",
 };
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ede0f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#2d0a1e" },
+  ],
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -29,11 +36,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang}>
-      <head>
-        <meta name="theme-color" content="#ede0f0" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#2d0a1e" media="(prefers-color-scheme: dark)" />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <LanguageProvider>
           {children}
         </LanguageProvider>
