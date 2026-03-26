@@ -35,6 +35,15 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
 
+    React.useEffect(() => {
+        if (!isPickerOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsPickerOpen(false);
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isPickerOpen]);
+
     function handleShareProfile() {
         const url = `${window.location.origin}/u/${user.username}`;
         if (navigator.share) {
@@ -76,6 +85,15 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const selectedIndex = React.useMemo(
         () => (selectedWine ? filteredWines.findIndex((w) => w.id === selectedWine.id) : -1),
         [filteredWines, selectedWine]
+    );
+
+    const PickerPill = ({ emoji, label, onClick }: { emoji: string; label: string; onClick: () => void }) => (
+        <button
+            onClick={onClick}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
+        >
+            <span aria-hidden="true">{emoji}</span> {label}
+        </button>
     );
 
     return (
@@ -188,7 +206,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-30"
+                            className="fixed inset-0 z-40 bg-black/10"
                             onClick={() => setIsPickerOpen(false)}
                         />
                         <motion.div
@@ -196,20 +214,18 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 8 }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="fixed bottom-48 sm:bottom-24 right-6 z-40 flex flex-col gap-2 items-end"
+                            className="fixed bottom-48 sm:bottom-24 right-6 z-50 flex flex-col gap-2 items-end"
                         >
-                            <button
+                            <PickerPill
+                                emoji="🍷"
+                                label={t.dashboard.addToCollection}
                                 onClick={() => { setIsPickerOpen(false); setAddMode("collection"); }}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
-                            >
-                                🍷 {t.dashboard.addToCollection}
-                            </button>
-                            <button
+                            />
+                            <PickerPill
+                                emoji="🔖"
+                                label={t.dashboard.addToWishlist}
                                 onClick={() => { setIsPickerOpen(false); setAddMode("wishlist"); }}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
-                            >
-                                🔖 {t.dashboard.addToWishlist}
-                            </button>
+                            />
                         </motion.div>
                     </>
                 )}
@@ -223,14 +239,14 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+                            className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
                             onClick={() => setAddMode(null)}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+                            className="fixed inset-0 z-60 flex items-center justify-center p-4 pointer-events-none"
                         >
                             <div className="w-full max-w-sm pointer-events-auto relative max-h-[90vh] overflow-y-auto rounded-2xl">
                                 <Button
@@ -254,7 +270,12 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                 className="fixed bottom-32 sm:bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
                 title={t.dashboard.addWineTitle}
             >
-                <Plus className="h-6 w-6" />
+                <motion.div
+                    animate={{ rotate: isPickerOpen ? 45 : 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                    <Plus className="h-6 w-6" />
+                </motion.div>
             </button>
 
             {/* Wine Details Modal */}
