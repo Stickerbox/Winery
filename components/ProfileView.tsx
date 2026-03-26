@@ -8,6 +8,8 @@ import { FollowButton } from "@/components/FollowButton";
 import { AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/components/LanguageContext";
 import Link from "next/link";
+import { Check, Link as LinkIcon } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 type ProfileUser = User & { wines: Wine[] };
 
@@ -19,9 +21,20 @@ interface ProfileViewProps {
 
 export function ProfileView({ profile, currentUserId, initialIsFollowing }: ProfileViewProps) {
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
+    const [copied, setCopied] = React.useState(false);
     const { t } = useTranslations();
 
     const showFollowButton = currentUserId !== null && currentUserId !== profile.id;
+    const isOwnProfile = currentUserId === profile.id;
+
+    function handleCopyLink() {
+        if (!navigator.clipboard) return;
+        const url = `${window.location.origin}/u/${profile.username}`;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }).catch(() => {});
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-20">
@@ -38,12 +51,25 @@ export function ProfileView({ profile, currentUserId, initialIsFollowing }: Prof
                             {t.profile.wineCount.replace("{count}", String(profile.wines.length))}
                         </p>
                     </div>
-                    {showFollowButton && (
-                        <FollowButton
-                            userId={profile.id}
-                            initialIsFollowing={initialIsFollowing}
-                        />
-                    )}
+                    <div className="flex items-center gap-2">
+                        {isOwnProfile && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full"
+                                onClick={handleCopyLink}
+                                title={t.profile.copyLink}
+                            >
+                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
+                            </Button>
+                        )}
+                        {showFollowButton && (
+                            <FollowButton
+                                userId={profile.id}
+                                initialIsFollowing={initialIsFollowing}
+                            />
+                        )}
+                    </div>
                 </div>
             </header>
 
