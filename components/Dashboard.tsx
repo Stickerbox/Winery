@@ -34,11 +34,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
 
-    const wishlistedKeys = React.useMemo(
-        () => new Set(wishlistItems.map((i) => `${i.name}::${i.addedByUsername}`)),
-        [wishlistItems]
-    );
-
     function handleShareProfile() {
         const url = `${window.location.origin}/u/${user.username}`;
         if (navigator.share) {
@@ -180,7 +175,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                         onWineClick={(wine) => setSelectedWine(wine)}
                     />
                 )}
-                {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistedKeys={wishlistedKeys} />}
+                {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistItems={wishlistItems} />}
                 {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} />}
             </main>
 

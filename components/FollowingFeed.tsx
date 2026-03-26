@@ -1,56 +1,72 @@
 "use client";
 
 import * as React from "react";
-import { Wine } from "@prisma/client";
+import { Wine, WishlistItem } from "@prisma/client";
 import { WineCard } from "@/components/WineCard";
 import { WineModal } from "@/components/WineModal";
 import { AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/components/LanguageContext";
-import { addToWishlist } from "@/app/actions";
-import { Bookmark } from "lucide-react";
+import { addToWishlist, removeFromWishlist } from "@/app/actions";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { groupWinesByMonth } from "@/lib/utils";
 
 type FeedWine = Wine & { user: { username: string } };
 
 interface FollowingFeedProps {
     wines: FeedWine[];
-    wishlistedKeys: Set<string>;
+    wishlistItems: WishlistItem[];
 }
 
-export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
+export function FollowingFeed({ wines, wishlistItems }: FollowingFeedProps) {
     const [selectedWine, setSelectedWine] = React.useState<FeedWine | null>(null);
-    const [localWishlisted, setLocalWishlisted] = React.useState<Set<string>>(new Set(wishlistedKeys));
-    const { t } = useTranslations();
+    const [localWishlistItems, setLocalWishlistItems] = React.useState<WishlistItem[]>(wishlistItems);
+    const { t, lang } = useTranslations();
     const pendingKeys = React.useRef(new Set<string>());
 
-    const wishlistedKeysJson = JSON.stringify([...wishlistedKeys].sort());
-    // Sync if parent's wishlistedKeys changes (e.g. after server revalidation)
+    const wishlistItemsJson = JSON.stringify(wishlistItems.map((i) => i.id).sort());
     React.useEffect(() => {
-        setLocalWishlisted(new Set(wishlistedKeys));
+        setLocalWishlistItems(wishlistItems);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wishlistedKeysJson]);
+    }, [wishlistItemsJson]);
 
-    async function handleWishlist(wine: FeedWine) {
+    const wishlistMap = React.useMemo(
+        () => new Map(localWishlistItems.map((i) => [`${i.name}::${i.addedByUsername}`, i.id])),
+        [localWishlistItems]
+    );
+
+    async function handleWishlistToggle(wine: FeedWine) {
         const key = `${wine.name}::${wine.user.username}`;
-        if (localWishlisted.has(key) || pendingKeys.current.has(key)) return;
+        if (pendingKeys.current.has(key)) return;
         pendingKeys.current.add(key);
-        setLocalWishlisted((prev) => {
-            const next = new Set(prev);
-            next.add(key);
-            return next;
-        }); // optimistic
-        try {
-            await addToWishlist(wine.id);
-        } catch {
-            // revert on failure
-            setLocalWishlisted((prev) => {
-                const next = new Set(prev);
-                next.delete(key);
-                return next;
-            });
-        } finally {
-            pendingKeys.current.delete(key);
+
+        const existingId = wishlistMap.get(key);
+        if (existingId === undefined) {
+            const pseudoItem: WishlistItem = {
+                id: -Date.now(),
+                userId: -1,
+                name: wine.name,
+                description: wine.description,
+                imagePath: wine.imagePath,
+                addedByUsername: wine.user.username,
+                createdAt: new Date(),
+            };
+            setLocalWishlistItems((prev) => [...prev, pseudoItem]);
+            try {
+                await addToWishlist(wine.id);
+            } catch {
+                setLocalWishlistItems((prev) => prev.filter((i) => i.id !== pseudoItem.id));
+            } finally {
+                pendingKeys.current.delete(key);
+            }
+        } else {
+            setLocalWishlistItems((prev) => prev.filter((i) => i.id !== existingId));
+            try {
+                await removeFromWishlist(existingId);
+            } catch {
+                setLocalWishlistItems(wishlistItems);
+            } finally {
+                pendingKeys.current.delete(key);
+            }
         }
     }
 
@@ -62,21 +78,24 @@ export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
         );
     }
 
+    const groups = groupWinesByMonth(wines, lang);
+
     return (
         <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                {wines.map((wine) => {
-                    const key = `${wine.name}::${wine.user.username}`;
-                    const isWishlisted = localWishlisted.has(key);
-                    return (
-                        <div key={wine.id}>
-                            <WineCard
-                                wine={wine}
-                                onClick={() => setSelectedWine(wine)}
-                                readonly
-                            />
-                            <div className="flex items-center justify-between mt-1 px-1">
-                                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            {groups.map(({ label, wines: groupWines }) => (
+                <div key={label}>
+                    <h2 className="text-2xl font-bold text-zinc-400 dark:text-zinc-500 px-4 pt-6 pb-2">
+                        {label}
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 pb-4">
+                        {groupWines.map((wine) => (
+                            <div key={wine.id}>
+                                <WineCard
+                                    wine={wine}
+                                    onClick={() => setSelectedWine(wine)}
+                                    readonly
+                                />
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 px-1">
                                     <Link
                                         href={`/u/${wine.user.username}`}
                                         className="hover:underline hover:text-violet-600"
@@ -84,31 +103,19 @@ export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
                                         {t.feed.by.replace("{username}", wine.user.username)}
                                     </Link>
                                 </p>
-                                <button
-                                    onClick={() => handleWishlist(wine)}
-                                    title={isWishlisted ? t.wishlist.wishlisted : t.wishlist.addToWishlist}
-                                    aria-label={isWishlisted ? t.wishlist.wishlisted : t.wishlist.addToWishlist}
-                                    aria-pressed={isWishlisted}
-                                    className={cn(
-                                        "p-1 rounded transition-colors",
-                                        isWishlisted
-                                            ? "text-violet-600 dark:text-violet-400"
-                                            : "text-zinc-400 hover:text-violet-500 dark:text-zinc-500 dark:hover:text-violet-400"
-                                    )}
-                                >
-                                    <Bookmark className={cn("h-4 w-4", isWishlisted && "fill-current")} />
-                                </button>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
             <AnimatePresence>
                 {selectedWine && (
                     <WineModal
                         wine={selectedWine}
                         onClose={() => setSelectedWine(null)}
                         readonly
+                        isWishlisted={wishlistMap.has(`${selectedWine.name}::${selectedWine.user.username}`)}
+                        onWishlistToggle={() => handleWishlistToggle(selectedWine)}
                     />
                 )}
             </AnimatePresence>
