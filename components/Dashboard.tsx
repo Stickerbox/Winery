@@ -236,7 +236,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
             </AnimatePresence>
 
             {/* Mobile Bottom Nav */}
-            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-20 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-3xl shadow-[var(--glass-shadow)] p-2">
+            <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-20 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-full shadow-[var(--glass-shadow)] h-14 px-2">
                 {(["collection", "following", "wishlist"] as const).map((tab) => (
                     <button
                         key={tab}

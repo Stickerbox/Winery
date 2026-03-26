@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Code Style Guidelines
+
+- Follow DRY principles strictly. Before writing new code, check for existing functions, utilities, or abstractions that can be reused.
+- When you see duplicated logic, extract it into a shared helper or utility function.
+- Do not copy-paste code blocks — abstract shared behavior into reusable components.
+- When modifying code, check if similar patterns exist elsewhere that should also be updated or consolidated.
+
 ## Commands
 
 ```bash

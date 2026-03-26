@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { WishlistItem } from "@prisma/client";
-import { Trash2, BookmarkPlus, X, Plus } from "lucide-react";
+import { Trash2, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { removeFromWishlist, moveToCollection } from "@/app/actions";
 import { WineForm } from "@/components/WineForm";
 import { WishlistModal } from "@/components/WishlistModal";
+import { WineCard } from "@/components/WineCard";
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "@/components/LanguageContext";
 
@@ -37,26 +38,11 @@ export function WishlistGrid({ items }: WishlistGridProps) {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                 {items.map((item) => (
                     <div key={item.id} className="flex flex-col">
-                        <div
-                            className="relative rounded-xl overflow-hidden bg-white/10 border border-white/20 aspect-[4/5] cursor-pointer"
+                        <WineCard
+                            wine={item}
                             onClick={() => setSelectedItem(item)}
-                        >
-                            {item.imagePath ? (
-                                <img
-                                    src={item.imagePath}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-                                    <BookmarkPlus className="h-12 w-12 text-zinc-300 dark:text-zinc-600" />
-                                </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                                <p className="font-bold text-sm leading-tight line-clamp-2">{item.name}</p>
-                            </div>
-                        </div>
+                            hideRating={true}
+                        />
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 px-1">
                             {t.wishlist.by.replace("{username}", item.addedByUsername)}
                         </p>
