@@ -263,8 +263,9 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
             {/* Mobile Share Button */}
             <button
                 onClick={handleShareProfile}
-                className="fixed bottom-4 right-4 z-20 flex sm:hidden h-14 w-14 rounded-full items-center justify-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 shadow-[var(--glass-shadow)] text-zinc-500"
+                className="fixed bottom-4 right-4 z-[21] flex sm:hidden h-14 w-14 rounded-full items-center justify-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 shadow-[var(--glass-shadow)] text-zinc-500"
                 title={t.dashboard.shareTitle}
+                aria-label={t.dashboard.shareTitle}
             >
                 <Share2 className="h-5 w-5" />
             </button>
