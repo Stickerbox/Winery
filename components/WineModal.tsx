@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion, AnimatePresence } from "framer-motion";
 import { deleteWine, generateShareToken } from "@/app/actions";
 import { useTranslations } from "@/components/LanguageContext";
 import { useSwipeable } from "react-swipeable";
+import { cn } from "@/lib/utils";
 
 interface WineModalProps {
     wine: Wine;
@@ -19,6 +20,8 @@ interface WineModalProps {
     hasNext?: boolean;
     onPrev?: () => void;
     onNext?: () => void;
+    isWishlisted?: boolean;
+    onWishlistToggle?: () => void;
 }
 
 export function WineModal({
@@ -30,6 +33,8 @@ export function WineModal({
     hasNext = false,
     onPrev = () => {},
     onNext = () => {},
+    isWishlisted = false,
+    onWishlistToggle,
 }: WineModalProps) {
     const [copied, setCopied] = React.useState(false);
     const [confirmingDelete, setConfirmingDelete] = React.useState(false);
@@ -149,6 +154,29 @@ export function WineModal({
                         >
                             <X className="h-5 w-5" />
                         </Button>
+                        {readonly && onWishlistToggle && (
+                            <button
+                                onClick={onWishlistToggle}
+                                className={cn(
+                                    "absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-sm text-white text-sm flex items-center gap-1.5 whitespace-nowrap transition-colors",
+                                    isWishlisted
+                                        ? "bg-violet-600/70 hover:bg-violet-700/70"
+                                        : "bg-black/40 hover:bg-black/60"
+                                )}
+                            >
+                                {isWishlisted ? (
+                                    <>
+                                        <Check className="h-4 w-4" />
+                                        {t.wishlist.removeFromWishlist}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="h-4 w-4" />
+                                        {t.wishlist.addToWishlist}
+                                    </>
+                                )}
+                            </button>
+                        )}
                     </motion.div>
 
                     <motion.div
