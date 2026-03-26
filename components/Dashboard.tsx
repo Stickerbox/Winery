@@ -144,14 +144,14 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
             </header>
 
             <main className="container mx-auto max-w-7xl">
-                <div className="hidden sm:flex border-b border-white/20 dark:border-white/15 px-4">
+                <div className="hidden sm:flex items-center border-b border-white/20 dark:border-white/15 px-4">
                     {(["collection", "following", "wishlist"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             aria-current={activeTab === tab ? "page" : undefined}
                             className={cn(
-                                "px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+                                "px-4 py-3 text-[30px] font-medium transition-colors border-b-2 -mb-px",
                                 activeTab === tab
                                     ? "border-violet-600 text-violet-600"
                                     : "border-transparent text-zinc-500 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white"
