@@ -41,11 +41,14 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     );
 
     function handleCopyProfileLink() {
+        if (!navigator.clipboard) return;
         const url = `${window.location.origin}/u/${user.username}`;
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        }).catch(() => {});
+        }).catch(() => {
+            // Clipboard unavailable — no-op; button stays in default state
+        });
     }
 
     const filteredWines = React.useMemo(() => {
