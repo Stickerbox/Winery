@@ -267,6 +267,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
             {/* Floating Add Button */}
             <button
                 onClick={() => setIsPickerOpen((prev) => !prev)}
+                aria-expanded={isPickerOpen}
                 className="fixed bottom-32 sm:bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
                 title={t.dashboard.addWineTitle}
             >

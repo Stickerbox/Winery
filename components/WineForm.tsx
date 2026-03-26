@@ -103,7 +103,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                 onSuccess?.();
             } catch (error) {
                 console.error(error);
-                alert(t.wineForm.saveFailed);
+                alert(mode === "wishlist" ? t.wineForm.saveFailedWishlist : t.wineForm.saveFailed);
             }
         });
     };

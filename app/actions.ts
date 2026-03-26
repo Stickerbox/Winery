@@ -141,6 +141,8 @@ export async function addToWishlistManual(formData: FormData) {
         });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+            // Duplicate entry — item already on wishlist. Clean up uploaded file and
+            // return silently (caller treats non-throw as success; no DB change needed).
             await fs.unlink(path.join(process.cwd(), "public", imagePath)).catch(() => {});
             return;
         }
