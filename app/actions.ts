@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -230,12 +230,15 @@ export async function unfollowUser(userId: number) {
     revalidatePath("/");
 }
 
-export async function addToWishlist(wineId: number, addedByUsername: string) {
+export async function addToWishlist(wineId: number) {
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");
 
     const wine = await prisma.wine.findUnique({ where: { id: wineId } });
     if (!wine) throw new Error("Wine not found");
+
+    const owner = await prisma.user.findUnique({ where: { id: wine.userId }, select: { username: true } });
+    if (!owner) throw new Error("Wine owner not found");
 
     try {
         await prisma.wishlistItem.create({
@@ -244,11 +247,14 @@ export async function addToWishlist(wineId: number, addedByUsername: string) {
                 name: wine.name,
                 description: wine.description,
                 imagePath: wine.imagePath,
-                addedByUsername,
+                addedByUsername: owner.username,
             },
         });
-    } catch {
-        // Unique constraint violation — already wishlisted, treat as no-op
+    } catch (e) {
+        if (!(e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002")) {
+            throw e;
+        }
+        // Unique constraint — already wishlisted, treat as no-op
     }
     revalidatePath("/");
 }
@@ -308,15 +314,24 @@ export async function moveToCollection(itemId: number, formData: FormData) {
         .toBuffer();
 
     await fs.writeFile(path.join(uploadDir, filename), compressed);
-    const imagePath = `/uploads/${filename}`;
+    let imagePath: string | null = null;
 
-    // Atomically create Wine + delete WishlistItem
-    await prisma.$transaction([
-        prisma.wine.create({
-            data: { name, description, rating, imagePath, userId: currentUser.id },
-        }),
-        prisma.wishlistItem.delete({ where: { id: itemId } }),
-    ]);
+    try {
+        imagePath = `/uploads/${filename}`;
+
+        // Atomically create Wine + delete WishlistItem
+        await prisma.$transaction([
+            prisma.wine.create({
+                data: { name, description, rating, imagePath, userId: currentUser.id },
+            }),
+            prisma.wishlistItem.delete({ where: { id: itemId } }),
+        ]);
+    } catch (e) {
+        if (imagePath) {
+            await fs.unlink(path.join(process.cwd(), "public", imagePath)).catch(() => {});
+        }
+        throw e;
+    }
 
     revalidatePath("/");
 }
