@@ -18,6 +18,7 @@ export const fr = {
     searchTitle: "Rechercher",
     logoutTitle: "Déconnexion",
     addWineTitle: "Ajouter un vin",
+    shareTitle: "Partager le profil",
     tabCollection: "Collection",
     tabFollowing: "Abonnements",
     tabWishlist: "Liste de souhaits",
@@ -65,9 +66,18 @@ export const fr = {
     follow: "Suivre",
     unfollow: "Ne plus suivre",
     wineCount: "{count} vins",
+    copyLink: "Copier le lien du profil",
   },
   feed: {
     empty: "Suivez des utilisateurs pour voir leurs vins ici.",
+    by: "par {username}",
+  },
+  wishlist: {
+    addToWishlist: "Ajouter à la liste de souhaits",
+    wishlisted: "Ajouté",
+    removeFromWishlist: "Supprimer",
+    moveToCollection: "Ajouter à la collection",
+    empty: "Votre liste de souhaits est vide. Parcourez l'onglet Abonnements pour sauvegarder des vins.",
     by: "par {username}",
   },
 } satisfies typeof en;

@@ -16,6 +16,7 @@ export const en = {
     searchTitle: "Search",
     logoutTitle: "Logout",
     addWineTitle: "Add Wine",
+    shareTitle: "Share Profile",
     tabCollection: "Collection",
     tabFollowing: "Following",
     tabWishlist: "Wishlist",
@@ -63,9 +64,18 @@ export const en = {
     follow: "Follow",
     unfollow: "Unfollow",
     wineCount: "{count} wines",
+    copyLink: "Copy Profile Link",
   },
   feed: {
     empty: "Follow some users to see their wines here.",
+    by: "by {username}",
+  },
+  wishlist: {
+    addToWishlist: "Add to Wishlist",
+    wishlisted: "Wishlisted",
+    removeFromWishlist: "Remove",
+    moveToCollection: "Move to Collection",
+    empty: "Your wishlist is empty. Browse the Following tab to save wines.",
     by: "by {username}",
   },
 };
