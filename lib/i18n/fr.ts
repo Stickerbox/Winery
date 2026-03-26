@@ -22,6 +22,8 @@ export const fr = {
     tabCollection: "Collection",
     tabFollowing: "Abonnements",
     tabWishlist: "Liste de souhaits",
+    addToCollection: "Ajouter à la collection",
+    addToWishlist: "Ajouter à la liste de souhaits",
   },
   wineForm: {
     takePhoto: "Prenez une photo de votre vin",
@@ -36,6 +38,8 @@ export const fr = {
     ratingRequired: "Veuillez sélectionner une note",
     saveFailed: "Échec de l'ajout du vin",
     imageRequired: "Veuillez d'abord prendre ou télécharger une photo",
+    saveWishlist: "Ajouter à la liste",
+    savingWishlist: "Ajout...",
   },
   wineModal: {
     tastingNotes: "Notes de dégustation",

@@ -20,6 +20,8 @@ export const en = {
     tabCollection: "Collection",
     tabFollowing: "Following",
     tabWishlist: "Wishlist",
+    addToCollection: "Add to Collection",
+    addToWishlist: "Add to Wishlist",
   },
   wineForm: {
     takePhoto: "Take a photo of your wine",
@@ -34,6 +36,8 @@ export const en = {
     ratingRequired: "Please select a rating",
     saveFailed: "Failed to add wine",
     imageRequired: "Please take or upload a photo first",
+    saveWishlist: "Add to Wishlist",
+    savingWishlist: "Adding...",
   },
   wineModal: {
     tastingNotes: "Tasting Notes",
