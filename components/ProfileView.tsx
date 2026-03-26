@@ -33,7 +33,9 @@ export function ProfileView({ profile, currentUserId, initialIsFollowing }: Prof
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        }).catch(() => {});
+        }).catch(() => {
+            // Clipboard unavailable — no-op; button stays in default state
+        });
     }
 
     return (

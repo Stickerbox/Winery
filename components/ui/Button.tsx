@@ -3,13 +3,6 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Note: I'm not using class-variance-authority yet as I didn't install it, 
-// but I can implement a simple version or just use clsx/tailwind-merge directly.
-// Actually, standard shadcn/ui uses cva. I should probably install it or just write simple conditional classes.
-// I'll write simple conditional classes to avoid extra deps for now, or I can install `class-variance-authority`.
-// Given the instructions to be "premium", cva is nice. I'll install it quickly.
-// Wait, I can't install mid-stream easily without breaking flow.
-// I'll just write a robust component without cva for now, it's just as good.
 
 export interface ButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -42,15 +35,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             lg: "h-11 rounded-md px-8",
             icon: "h-10 w-10",
         };
-
-        // I need to define these colors in globals.css or just use standard tailwind colors.
-        // For now I'll use standard tailwind colors mapped to these names in the class string if needed, 
-        // but better to use the variables I saw in globals.css (background, foreground).
-        // I'll assume standard shadcn-like variables are or will be set up. 
-        // Actually, globals.css only had background/foreground.
-        // I should update globals.css to include primary, secondary, etc.
-        // Or I can just use hardcoded tailwind colors for this MVP.
-        // I'll use hardcoded colors for "premium" look (e.g. violet/purple for primary).
 
         const premiumVariants = {
             default: "bg-violet-600 text-white hover:bg-violet-700 shadow-md shadow-violet-200 dark:shadow-none",
