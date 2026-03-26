@@ -22,16 +22,24 @@ export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
     const [selectedWine, setSelectedWine] = React.useState<FeedWine | null>(null);
     const [localWishlisted, setLocalWishlisted] = React.useState<Set<string>>(new Set(wishlistedKeys));
     const { t } = useTranslations();
+    const pendingKeys = React.useRef(new Set<string>());
 
+    const wishlistedKeysJson = JSON.stringify([...wishlistedKeys].sort());
     // Sync if parent's wishlistedKeys changes (e.g. after server revalidation)
     React.useEffect(() => {
         setLocalWishlisted(new Set(wishlistedKeys));
-    }, [wishlistedKeys]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wishlistedKeysJson]);
 
     async function handleWishlist(wine: FeedWine) {
         const key = `${wine.name}::${wine.user.username}`;
-        if (localWishlisted.has(key)) return; // already wishlisted — no toggle
-        setLocalWishlisted((prev) => new Set([...prev, key])); // optimistic
+        if (localWishlisted.has(key) || pendingKeys.current.has(key)) return;
+        pendingKeys.current.add(key);
+        setLocalWishlisted((prev) => {
+            const next = new Set(prev);
+            next.add(key);
+            return next;
+        }); // optimistic
         try {
             await addToWishlist(wine.id);
         } catch {
@@ -41,6 +49,8 @@ export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
                 next.delete(key);
                 return next;
             });
+        } finally {
+            pendingKeys.current.delete(key);
         }
     }
 
@@ -77,6 +87,8 @@ export function FollowingFeed({ wines, wishlistedKeys }: FollowingFeedProps) {
                                 <button
                                     onClick={() => handleWishlist(wine)}
                                     title={isWishlisted ? t.wishlist.wishlisted : t.wishlist.addToWishlist}
+                                    aria-label={isWishlisted ? t.wishlist.wishlisted : t.wishlist.addToWishlist}
+                                    aria-pressed={isWishlisted}
                                     className={cn(
                                         "p-1 rounded transition-colors",
                                         isWishlisted
