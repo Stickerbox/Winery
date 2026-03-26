@@ -71,6 +71,10 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: W
     };
 
     const handleSubmit = async (formData: FormData) => {
+        if (!compressedFileRef.current) {
+            alert(t.wineForm.saveFailed);
+            return;
+        }
         if (rating === 0) {
             alert(t.wineForm.ratingRequired);
             return;
@@ -140,7 +144,6 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit }: W
                             capture="environment"
                             className="hidden"
                             onChange={handleImageChange}
-                            required
                         />
                     </motion.div>
 
