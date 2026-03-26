@@ -76,7 +76,7 @@ export const fr = {
   wishlist: {
     addToWishlist: "Ajouter à la liste de souhaits",
     wishlisted: "Ajouté",
-    removeFromWishlist: "Supprimer",
+    removeFromWishlist: "Retirer de la liste de souhaits",
     moveToCollection: "Ajouter à la collection",
     empty: "Votre liste de souhaits est vide. Parcourez l'onglet Abonnements pour sauvegarder des vins.",
     by: "par {username}",

@@ -74,7 +74,7 @@ export const en = {
   wishlist: {
     addToWishlist: "Add to Wishlist",
     wishlisted: "Wishlisted",
-    removeFromWishlist: "Remove",
+    removeFromWishlist: "Remove from Wishlist",
     moveToCollection: "Move to Collection",
     empty: "Your wishlist is empty. Browse the Following tab to save wines.",
     by: "by {username}",
