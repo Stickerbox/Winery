@@ -2,16 +2,20 @@
 
 import * as React from "react";
 import { WishlistItem } from "@prisma/client";
-import { X, BookmarkPlus } from "lucide-react";
+import { X, BookmarkPlus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { motion } from "framer-motion";
+import { useTranslations } from "@/components/LanguageContext";
 
 interface WishlistModalProps {
     item: WishlistItem;
     onClose: () => void;
+    onMoveToCollection?: () => void;
+    onRemove?: () => void;
 }
 
-export function WishlistModal({ item, onClose }: WishlistModalProps) {
+export function WishlistModal({ item, onClose, onMoveToCollection, onRemove }: WishlistModalProps) {
+    const { t } = useTranslations();
     React.useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === "Escape") onClose();
@@ -57,6 +61,28 @@ export function WishlistModal({ item, onClose }: WishlistModalProps) {
                         >
                             <X className="h-5 w-5" />
                         </Button>
+                        {(onMoveToCollection || onRemove) && (
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                                {onRemove && (
+                                    <button
+                                        onClick={() => { onRemove(); onClose(); }}
+                                        className="px-3 py-2 rounded-full backdrop-blur-sm bg-black/40 hover:bg-black/60 text-white text-sm flex items-center gap-1.5 whitespace-nowrap transition-colors"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {t.wishlist.removeFromWishlist}
+                                    </button>
+                                )}
+                                {onMoveToCollection && (
+                                    <button
+                                        onClick={() => { onMoveToCollection(); onClose(); }}
+                                        className="px-3 py-2 rounded-full backdrop-blur-sm bg-violet-600/70 hover:bg-violet-700/70 text-white text-sm flex items-center gap-1.5 whitespace-nowrap transition-colors"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        {t.wishlist.moveToCollection}
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="p-6">
                         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">

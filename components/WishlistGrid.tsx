@@ -80,6 +80,14 @@ export function WishlistGrid({ items }: WishlistGridProps) {
                     <WishlistModal
                         item={selectedItem}
                         onClose={() => setSelectedItem(null)}
+                        onMoveToCollection={() => setMovingItem(selectedItem)}
+                        onRemove={async () => {
+                            try {
+                                await removeFromWishlist(selectedItem.id);
+                            } catch {
+                                alert("Failed to remove from wishlist.");
+                            }
+                        }}
                     />
                 )}
             </AnimatePresence>
