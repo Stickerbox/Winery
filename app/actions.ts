@@ -97,15 +97,20 @@ export async function addWine(formData: FormData) {
 
     const imagePath = await uploadWineImage(image);
 
-    await prisma.wine.create({
-        data: {
-            name,
-            description,
-            rating,
-            imagePath,
-            userId: user.id,
-        },
-    });
+    try {
+        await prisma.wine.create({
+            data: {
+                name,
+                description,
+                rating,
+                imagePath,
+                userId: user.id,
+            },
+        });
+    } catch (e) {
+        await fs.unlink(path.join(process.cwd(), "public", imagePath)).catch(() => {});
+        throw e;
+    }
 
     revalidatePath("/");
 }
@@ -136,7 +141,7 @@ export async function addToWishlistManual(formData: FormData) {
         });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-            // Already on wishlist — no-op
+            await fs.unlink(path.join(process.cwd(), "public", imagePath)).catch(() => {});
             return;
         }
         throw e;
