@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark } from "lucide-react";
+import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark, Check, Link as LinkIcon } from "lucide-react";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { logout } from "@/app/auth-actions";
 import { useTranslations } from "@/components/LanguageContext";
 import { FollowingFeed } from "@/components/FollowingFeed";
+import { WishlistGrid } from "@/components/WishlistGrid";
+import { WishlistItem } from "@prisma/client";
 
 type FeedWine = Wine & { user: { username: string } };
 
@@ -19,9 +21,10 @@ interface DashboardProps {
     wines: Wine[];
     user: User;
     feedWines: FeedWine[];
+    wishlistItems: WishlistItem[];
 }
 
-export function Dashboard({ wines, user, feedWines }: DashboardProps) {
+export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardProps) {
     const [isAddOpen, setIsAddOpen] = React.useState(false);
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -30,6 +33,20 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
     const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist">("collection");
     const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
+    const [copied, setCopied] = React.useState(false);
+
+    const wishlistedKeys = React.useMemo(
+        () => new Set(wishlistItems.map((i) => `${i.name}::${i.addedByUsername}`)),
+        [wishlistItems]
+    );
+
+    function handleCopyProfileLink() {
+        const url = `${window.location.origin}/u/${user.username}`;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }).catch(() => {});
+    }
 
     const filteredWines = React.useMemo(() => {
         const result = searchQuery.trim()
@@ -97,6 +114,15 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                         >
                             {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
                         </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={handleCopyProfileLink}
+                            title={t.dashboard.shareTitle}
+                        >
+                            {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
+                        </Button>
                         <form action={logout}>
                             <Button variant="ghost" size="icon" className="rounded-full" title={t.dashboard.logoutTitle}>
                                 <LogOut className="h-4 w-4" />
@@ -155,8 +181,8 @@ export function Dashboard({ wines, user, feedWines }: DashboardProps) {
                         onWineClick={(wine) => setSelectedWine(wine)}
                     />
                 )}
-                {activeTab === "following" && <FollowingFeed wines={feedWines} />}
-                {activeTab === "wishlist" && null}
+                {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistedKeys={wishlistedKeys} />}
+                {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} />}
             </main>
 
             {/* Add Wine Modal */}
