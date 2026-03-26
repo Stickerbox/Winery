@@ -164,6 +164,14 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                                 : t.dashboard.tabWishlist}
                         </button>
                     ))}
+                    <button
+                        onClick={handleShareProfile}
+                        className="ml-auto h-8 w-8 rounded-full flex items-center justify-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 text-zinc-500 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white"
+                        title={t.dashboard.shareTitle}
+                        aria-label={t.dashboard.shareTitle}
+                    >
+                        <Share2 className="h-4 w-4" />
+                    </button>
                 </div>
 
                 {activeTab === "collection" && (
