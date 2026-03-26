@@ -25,7 +25,8 @@ interface DashboardProps {
 }
 
 export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardProps) {
-    const [isAddOpen, setIsAddOpen] = React.useState(false);
+    const [isPickerOpen, setIsPickerOpen] = React.useState(false);
+    const [addMode, setAddMode] = React.useState<"collection" | "wishlist" | null>(null);
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
@@ -179,16 +180,51 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                 {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} />}
             </main>
 
+            {/* Add Picker Popup */}
+            <AnimatePresence>
+                {isPickerOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-30"
+                            onClick={() => setIsPickerOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 8 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 8 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="fixed bottom-48 sm:bottom-24 right-6 z-40 flex flex-col gap-2 items-end"
+                        >
+                            <button
+                                onClick={() => { setIsPickerOpen(false); setAddMode("collection"); }}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
+                            >
+                                🍷 {t.dashboard.addToCollection}
+                            </button>
+                            <button
+                                onClick={() => { setIsPickerOpen(false); setAddMode("wishlist"); }}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg text-sm font-medium text-zinc-800 dark:text-white hover:bg-violet-50 dark:hover:bg-violet-950 border border-white/30 dark:border-white/20 transition-colors whitespace-nowrap"
+                            >
+                                🔖 {t.dashboard.addToWishlist}
+                            </button>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
             {/* Add Wine Modal */}
             <AnimatePresence>
-                {isAddOpen && (
+                {addMode !== null && (
                     <>
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
-                            onClick={() => setIsAddOpen(false)}
+                            onClick={() => setAddMode(null)}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -201,11 +237,11 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                                     size="icon"
                                     variant="ghost"
                                     className="absolute -top-12 right-0 text-white hover:bg-white/20 rounded-full"
-                                    onClick={() => setIsAddOpen(false)}
+                                    onClick={() => setAddMode(null)}
                                 >
                                     <X className="h-6 w-6" />
                                 </Button>
-                                <WineForm onSuccess={() => setIsAddOpen(false)} />
+                                <WineForm mode={addMode} onSuccess={() => setAddMode(null)} />
                             </div>
                         </motion.div>
                     </>
@@ -214,7 +250,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
 
             {/* Floating Add Button */}
             <button
-                onClick={() => setIsAddOpen(true)}
+                onClick={() => setIsPickerOpen((prev) => !prev)}
                 className="fixed bottom-32 sm:bottom-6 right-6 z-30 h-14 w-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-2xl font-light"
                 title={t.dashboard.addWineTitle}
             >
