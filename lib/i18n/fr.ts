@@ -38,8 +38,8 @@ export const fr = {
     ratingRequired: "Veuillez sélectionner une note",
     saveFailed: "Échec de l'ajout du vin",
     imageRequired: "Veuillez d'abord prendre ou télécharger une photo",
-    saveWishlist: "Ajouter à la liste",
-    savingWishlist: "Ajout...",
+    saveWishlist: "Ajouter à la liste de souhaits",
+    savingWishlist: "Ajout en cours...",
   },
   wineModal: {
     tastingNotes: "Notes de dégustation",
