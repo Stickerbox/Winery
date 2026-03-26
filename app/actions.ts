@@ -230,6 +230,97 @@ export async function unfollowUser(userId: number) {
     revalidatePath("/");
 }
 
+export async function addToWishlist(wineId: number, addedByUsername: string) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    const wine = await prisma.wine.findUnique({ where: { id: wineId } });
+    if (!wine) throw new Error("Wine not found");
+
+    try {
+        await prisma.wishlistItem.create({
+            data: {
+                userId: currentUser.id,
+                name: wine.name,
+                description: wine.description,
+                imagePath: wine.imagePath,
+                addedByUsername,
+            },
+        });
+    } catch {
+        // Unique constraint violation — already wishlisted, treat as no-op
+    }
+    revalidatePath("/");
+}
+
+export async function removeFromWishlist(itemId: number) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    // deleteMany used for owner check — does NOT delete image files;
+    // imagePath is a snapshot of the original owner's file.
+    await prisma.wishlistItem.deleteMany({
+        where: { id: itemId, userId: currentUser.id },
+    });
+    revalidatePath("/");
+}
+
+export async function getWishlist() {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return [];
+
+    return await prisma.wishlistItem.findMany({
+        where: { userId: currentUser.id },
+        orderBy: { createdAt: "desc" },
+    });
+}
+
+export async function moveToCollection(itemId: number, formData: FormData) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    const item = await prisma.wishlistItem.findUnique({ where: { id: itemId } });
+    if (!item || item.userId !== currentUser.id) throw new Error("Not found");
+
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const rating = parseInt(formData.get("rating") as string);
+    const image = formData.get("image") as File;
+
+    if (!name || !description || !rating || !image) {
+        throw new Error("Missing required fields");
+    }
+
+    // Write image first (outside transaction — same pattern as addWine)
+    const buffer = Buffer.from(await image.arrayBuffer());
+    const filename = `${randomUUID()}.jpg`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+    try {
+        await fs.access(uploadDir);
+    } catch {
+        await fs.mkdir(uploadDir, { recursive: true });
+    }
+
+    const compressed = await sharp(buffer)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+
+    await fs.writeFile(path.join(uploadDir, filename), compressed);
+    const imagePath = `/uploads/${filename}`;
+
+    // Atomically create Wine + delete WishlistItem
+    await prisma.$transaction([
+        prisma.wine.create({
+            data: { name, description, rating, imagePath, userId: currentUser.id },
+        }),
+        prisma.wishlistItem.delete({ where: { id: itemId } }),
+    ]);
+
+    revalidatePath("/");
+}
+
 export async function getFollowingFeed() {
     const currentUser = await getCurrentUser();
     if (!currentUser) return [];
