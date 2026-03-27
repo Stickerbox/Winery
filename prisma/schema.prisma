@@ -24,7 +24,7 @@ model Wine {
   id               Int      @id @default(autoincrement())
   name             String
   description      String
-  rating           Int
+  rating           Float
   imagePath        String
   createdAt        DateTime @default(now())
   userId           Int
