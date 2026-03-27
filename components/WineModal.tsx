@@ -247,6 +247,17 @@ export function WineModal({
                             </p>
                         </div>
 
+                        {wine.notes && (
+                            <div className="mt-6">
+                                <h3 className="text-sm font-medium text-zinc-500 dark:text-white/50 uppercase tracking-wider mb-3">
+                                    {t.wineModal.personalNotes}
+                                </h3>
+                                <p className="text-zinc-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
+                                    {wine.notes}
+                                </p>
+                            </div>
+                        )}
+
                         {!readonly && (
                             <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/15 flex items-center justify-between">
                                 <Button

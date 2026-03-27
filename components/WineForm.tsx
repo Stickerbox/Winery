@@ -30,6 +30,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
     const [name, setName] = React.useState(initialValues?.name ?? "");
     const [description, setDescription] = React.useState(initialValues?.description ?? "");
+    const [notes, setNotes] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
     const { t } = useTranslations();
@@ -104,6 +105,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                 setImagePreview(null);
                 setName(initialValues?.name ?? "");
                 setDescription(initialValues?.description ?? "");
+                setNotes("");
                 setPhase(initialValues ? "review" : "capture");
                 compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
@@ -196,6 +198,19 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                         <div className="flex justify-center py-1">
                                             <RatingStar rating={rating} onRatingChange={setRating} className="gap-2" />
                                         </div>
+                                    </div>
+                                )}
+
+                                {mode !== "wishlist" && (
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium leading-none">{t.wineForm.notesLabel}</label>
+                                        <Textarea
+                                            name="notes"
+                                            placeholder={t.wineForm.notesPlaceholder}
+                                            className="min-h-[60px]"
+                                            value={notes}
+                                            onChange={(e) => setNotes(e.target.value)}
+                                        />
                                     </div>
                                 )}
 

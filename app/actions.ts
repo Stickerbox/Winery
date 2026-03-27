@@ -99,6 +99,7 @@ export async function addWine(formData: FormData) {
     const description = formData.get("description") as string;
     const rating = parseFloat(formData.get("rating") as string);
     const image = formData.get("image") as File;
+    const notes = (formData.get("notes") as string) || null;
 
     if (!name || !description || !rating || !image) {
         throw new Error("Missing required fields");
@@ -114,6 +115,7 @@ export async function addWine(formData: FormData) {
                 rating,
                 imagePath,
                 userId: user.id,
+                notes,
             },
         });
     } catch (e) {
@@ -343,6 +345,7 @@ export async function moveToCollection(itemId: number, formData: FormData) {
     const description = formData.get("description") as string;
     const rating = parseFloat(formData.get("rating") as string);
     const image = formData.get("image") as File;
+    const notes = (formData.get("notes") as string) || null;
 
     if (!name || !description || !rating || !image) {
         throw new Error("Missing required fields");
@@ -355,7 +358,7 @@ export async function moveToCollection(itemId: number, formData: FormData) {
 
         await prisma.$transaction([
             prisma.wine.create({
-                data: { name, description, rating, imagePath, userId: currentUser.id },
+                data: { name, description, rating, imagePath, userId: currentUser.id, notes },
             }),
             prisma.wishlistItem.delete({ where: { id: itemId } }),
         ]);
