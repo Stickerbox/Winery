@@ -324,45 +324,45 @@ export function WineModal({
                                 )}
                                 <div className="flex items-center justify-between">
                                     {isEditing ? (
-                                        <>
-                                            <Button
-                                                variant="ghost"
-                                                className="gap-2 text-zinc-600 dark:text-white/60"
-                                                onClick={() => { setIsEditing(false); setSaveError(null); }}
-                                                disabled={isSaving}
-                                            >
-                                                {t.common.cancel}
-                                            </Button>
-                                            <AnimatePresence>
-                                                {isEditing && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 20 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: 20 }}
-                                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                    >
-                                                        <Button
-                                                            onClick={handleSave}
-                                                            disabled={isSaving || !editName.trim() || !editDescription.trim() || editRating === 0}
-                                                            className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white"
-                                                        >
-                                                            {isSaving ? t.wineModal.savingChanges : t.wineModal.saveChanges}
-                                                        </Button>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-2 text-zinc-600 dark:text-white/60"
+                                            onClick={() => { setIsEditing(false); setSaveError(null); }}
+                                            disabled={isSaving}
+                                        >
+                                            {t.common.cancel}
+                                        </Button>
                                     ) : (
-                                        <>
-                                            <Button
-                                                variant="ghost"
-                                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
-                                                onClick={() => setConfirmingDelete(true)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                                {t.common.delete}
-                                            </Button>
-                                            <div className="flex items-center gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
+                                            onClick={() => setConfirmingDelete(true)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            {t.common.delete}
+                                        </Button>
+                                    )}
+                                    <div className="flex items-center gap-1">
+                                        <AnimatePresence>
+                                            {isEditing && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 20 }}
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                >
+                                                    <Button
+                                                        onClick={handleSave}
+                                                        disabled={isSaving || !editName.trim() || !editDescription.trim() || editRating === 0}
+                                                        className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white"
+                                                    >
+                                                        {isSaving ? t.wineModal.savingChanges : t.wineModal.saveChanges}
+                                                    </Button>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                        {!isEditing && (
+                                            <>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -380,9 +380,9 @@ export function WineModal({
                                                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
                                                     {copied ? t.common.copied : t.common.share}
                                                 </Button>
-                                            </div>
-                                        </>
-                                    )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}
