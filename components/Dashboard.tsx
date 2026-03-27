@@ -150,7 +150,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={t.dashboard.searchPlaceholder}
-                                className="w-full rounded-lg border border-white/30 dark:border-white/20 bg-white/30 dark:bg-white/10 px-3 py-1.5 text-sm text-zinc-700 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-zinc-400 dark:placeholder:text-white/40"
+                                className="w-full rounded-lg border border-white/30 dark:border-white/20 bg-white/30 dark:bg-white/10 px-3 py-1.5 text-[16px] text-zinc-700 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-zinc-400 dark:placeholder:text-white/40"
                             />
                         </motion.div>
                     )}

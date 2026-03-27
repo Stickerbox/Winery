@@ -33,6 +33,13 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
     const { t } = useTranslations();
+    const analyzingText = React.useRef<string>("");
+
+    const startAnalyzing = () => {
+        const messages = t.wineForm.analyzing;
+        analyzingText.current = messages[Math.floor(Math.random() * messages.length)];
+        setPhase("analyzing");
+    };
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -56,7 +63,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
         if (skipAnalysis) {
             setPhase("review");
         } else {
-            setPhase("analyzing");
+            startAnalyzing();
             try {
                 const fd = new FormData();
                 fd.append("image", compressedFileRef.current);
@@ -131,7 +138,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                 {phase === "analyzing" && (
                                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3">
                                         <div className="h-7 w-7 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                        <p className="text-white text-sm font-medium tracking-wide">{t.wineForm.analyzing}</p>
+                                        <p className="text-white text-sm font-medium tracking-wide">{analyzingText.current}</p>
                                     </div>
                                 )}
                             </>
