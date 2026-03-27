@@ -236,9 +236,18 @@ export function WineModal({
                     >
                         <div className="flex items-start justify-between mb-6">
                             <div>
-                                <motion.h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">
-                                    {wine.name}
-                                </motion.h2>
+                                {isEditing ? (
+                                    <Input
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        className="text-2xl font-bold mb-2"
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <motion.h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">
+                                        {wine.name}
+                                    </motion.h2>
+                                )}
                                 <div className="flex items-center text-zinc-500 dark:text-white/50 text-sm">
                                     <Calendar className="h-4 w-4 mr-1" />
                                     {new Date(wine.createdAt).toLocaleDateString()}
@@ -283,36 +292,98 @@ export function WineModal({
                                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
                                 </Button>
                             </div>
-                            <RatingStar rating={wine.rating} readonly className="gap-2 [&_svg]:w-8 [&_svg]:h-8" />
+                            <RatingStar
+                                rating={isEditing ? editRating : wine.rating}
+                                onRatingChange={isEditing ? setEditRating : undefined}
+                                readonly={!isEditing}
+                                className="gap-2 [&_svg]:w-8 [&_svg]:h-8"
+                            />
                         </div>
 
                         <div className="flex-1">
                             <h3 className="text-sm font-medium text-zinc-500 dark:text-white/50 uppercase tracking-wider mb-3">
                                 {t.wineModal.tastingNotes}
                             </h3>
-                            <p className="text-zinc-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
-                                {wine.description}
-                            </p>
+                            {isEditing ? (
+                                <Textarea
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                    className="min-h-[120px]"
+                                />
+                            ) : (
+                                <p className="text-zinc-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
+                                    {wine.description}
+                                </p>
+                            )}
                         </div>
 
                         {!readonly && (
-                            <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/15 flex items-center justify-between">
-                                <Button
-                                    variant="ghost"
-                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
-                                    onClick={() => setConfirmingDelete(true)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                    {t.common.delete}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    className="hidden md:flex gap-2 text-zinc-600 dark:text-white/60"
-                                    onClick={handleShare}
-                                >
-                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
-                                    {copied ? t.common.copied : t.common.share}
-                                </Button>
+                            <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/15">
+                                {saveError && (
+                                    <p className="text-red-500 text-sm mb-3">{saveError}</p>
+                                )}
+                                <div className="flex items-center justify-between">
+                                    {isEditing ? (
+                                        <>
+                                            <Button
+                                                variant="ghost"
+                                                className="gap-2 text-zinc-600 dark:text-white/60"
+                                                onClick={() => { setIsEditing(false); setSaveError(null); }}
+                                                disabled={isSaving}
+                                            >
+                                                {t.common.cancel}
+                                            </Button>
+                                            <AnimatePresence>
+                                                {isEditing && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: 20 }}
+                                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                    >
+                                                        <Button
+                                                            onClick={handleSave}
+                                                            disabled={isSaving || !editName.trim() || !editDescription.trim() || editRating === 0}
+                                                            className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white"
+                                                        >
+                                                            {isSaving ? t.wineModal.savingChanges : t.wineModal.saveChanges}
+                                                        </Button>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Button
+                                                variant="ghost"
+                                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 gap-2"
+                                                onClick={() => setConfirmingDelete(true)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                {t.common.delete}
+                                            </Button>
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="rounded-full text-zinc-500 dark:text-white/60"
+                                                    onClick={startEditing}
+                                                    aria-label={t.wineModal.edit}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="hidden md:flex gap-2 text-zinc-600 dark:text-white/60"
+                                                    onClick={handleShare}
+                                                >
+                                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
+                                                    {copied ? t.common.copied : t.common.share}
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </motion.div>
