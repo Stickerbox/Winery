@@ -35,7 +35,7 @@ export function RatingStar({
                 return (
                     <div key={index} className="relative">
                         {/* Background empty star */}
-                        <Star className="h-6 w-6 fill-transparent text-zinc-300 dark:text-zinc-600" />
+                        <Star className="h-6 w-6 fill-zinc-200 dark:fill-zinc-700 text-zinc-400 dark:text-zinc-400" />
                         {/* Filled overlay — clipped to left 50% for half, full width for full */}
                         {fillAmount !== "empty" && (
                             <div
