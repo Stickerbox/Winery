@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma, Wine } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -383,4 +383,22 @@ export async function getFollowingFeed() {
         include: { user: { select: { username: true } } },
         orderBy: { createdAt: "desc" },
     });
+}
+
+export async function updateWine(
+    id: number,
+    data: { name: string; description: string; rating: number }
+): Promise<Wine> {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const wine = await prisma.wine.findUnique({ where: { id } });
+    if (!wine || wine.userId !== user.id) throw new Error("Not found");
+
+    const updated = await prisma.wine.update({
+        where: { id },
+        data: { name: data.name, description: data.description, rating: data.rating },
+    });
+    revalidatePath("/");
+    return updated;
 }
