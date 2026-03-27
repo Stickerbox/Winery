@@ -89,6 +89,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
             alert(t.wineForm.ratingRequired);
             return;
         }
+        formData.set("description", description);
         if (mode !== "wishlist") {
             formData.set("rating", rating.toString());
         }
@@ -107,6 +108,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                 setName(initialValues?.name ?? "");
                 setDescription(initialValues?.description ?? "");
                 setNotes("");
+                setIsDescriptionOpen(false);
                 setPhase(initialValues ? "review" : "capture");
                 compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
@@ -184,6 +186,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                 <div className="space-y-1">
                                     <button
                                         type="button"
+                                        id="description-label"
                                         className="flex items-center justify-between w-full text-sm font-medium leading-none"
                                         onClick={() => setIsDescriptionOpen((o) => !o)}
                                     >
@@ -204,6 +207,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                             >
                                                 <Textarea
                                                     name="description"
+                                                    aria-labelledby="description-label"
                                                     placeholder={t.wineForm.descriptionPlaceholder}
                                                     className="min-h-[60px]"
                                                     value={description}
