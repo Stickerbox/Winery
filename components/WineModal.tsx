@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { Wine } from "@prisma/client";
-import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { X, Calendar, Trash2, Share2, Check, ExternalLink, ChevronLeft, ChevronRight, Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { RatingStar } from "@/components/ui/RatingStar";
 import { motion, AnimatePresence } from "framer-motion";
-import { deleteWine, generateShareToken } from "@/app/actions";
+import { deleteWine, generateShareToken, updateWine } from "@/app/actions";
 import { useTranslations } from "@/components/LanguageContext";
 import { useSwipeable } from "react-swipeable";
 import { cn } from "@/lib/utils";
@@ -15,6 +17,7 @@ interface WineModalProps {
     wine: Wine;
     onClose: () => void;
     onDelete?: () => void;
+    onUpdate?: (wine: Wine) => void;
     readonly?: boolean;
     hasPrev?: boolean;
     hasNext?: boolean;
@@ -28,6 +31,7 @@ export function WineModal({
     wine,
     onClose,
     onDelete,
+    onUpdate,
     readonly = false,
     hasPrev = false,
     hasNext = false,
@@ -40,6 +44,12 @@ export function WineModal({
     const [confirmingDelete, setConfirmingDelete] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
     const [deleteError, setDeleteError] = React.useState<string | null>(null);
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [editName, setEditName] = React.useState(wine.name);
+    const [editDescription, setEditDescription] = React.useState(wine.description);
+    const [editRating, setEditRating] = React.useState(wine.rating);
+    const [isSaving, setIsSaving] = React.useState(false);
+    const [saveError, setSaveError] = React.useState<string | null>(null);
     const { t, lang } = useTranslations();
     const openedForWineId = React.useRef(wine.id);
     const swipeHandlers = useSwipeable({
@@ -53,6 +63,11 @@ export function WineModal({
         setDeleting(false);
         setDeleteError(null);
         setCopied(false);
+        setIsEditing(false);
+        setSaveError(null);
+        setEditName(wine.name);
+        setEditDescription(wine.description);
+        setEditRating(wine.rating);
     }, [wine.id]);
 
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
@@ -74,11 +89,18 @@ export function WineModal({
             if (confirmingDelete) return;
             if (e.key === "ArrowLeft" && hasPrev) onPrev();
             if (e.key === "ArrowRight" && hasNext) onNext();
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") {
+                if (isEditing) {
+                    setIsEditing(false);
+                    setSaveError(null);
+                } else {
+                    onClose();
+                }
+            }
         }
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [hasPrev, hasNext, onPrev, onNext, onClose, confirmingDelete]);
+    }, [hasPrev, hasNext, onPrev, onNext, onClose, confirmingDelete, isEditing]);
 
     async function handleDelete() {
         setDeleting(true);
@@ -90,6 +112,32 @@ export function WineModal({
             setDeleteError(t.wineModal.deleteFailed);
         } finally {
             setDeleting(false);
+        }
+    }
+
+    function startEditing() {
+        setEditName(wine.name);
+        setEditDescription(wine.description);
+        setEditRating(wine.rating);
+        setSaveError(null);
+        setIsEditing(true);
+    }
+
+    async function handleSave() {
+        setIsSaving(true);
+        setSaveError(null);
+        try {
+            const updated = await updateWine(wine.id, {
+                name: editName,
+                description: editDescription,
+                rating: editRating,
+            });
+            setIsEditing(false);
+            onUpdate?.(updated);
+        } catch {
+            setSaveError(t.wineModal.editFailed);
+        } finally {
+            setIsSaving(false);
         }
     }
 
