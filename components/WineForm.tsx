@@ -201,19 +201,6 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                     </div>
                                 )}
 
-                                {mode !== "wishlist" && (
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium leading-none">{t.wineForm.notesLabel}</label>
-                                        <Textarea
-                                            name="notes"
-                                            placeholder={t.wineForm.notesPlaceholder}
-                                            className="min-h-[60px]"
-                                            value={notes}
-                                            onChange={(e) => setNotes(e.target.value)}
-                                        />
-                                    </div>
-                                )}
-
                                 <Button
                                     type="submit"
                                     className="w-full"
