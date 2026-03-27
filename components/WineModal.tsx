@@ -389,12 +389,11 @@ export function WineModal({
                                             <>
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon"
-                                                    className="rounded-full text-zinc-500 dark:text-white/60"
+                                                    className="gap-2 text-zinc-500 dark:text-white/60"
                                                     onClick={startEditing}
-                                                    aria-label={t.wineModal.edit}
                                                 >
                                                     <Pencil className="h-4 w-4" />
+                                                    {t.wineModal.edit}
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
