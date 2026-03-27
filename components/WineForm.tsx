@@ -153,7 +153,6 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                             type="file"
                             name="image"
                             accept="image/*"
-                            capture="environment"
                             className="hidden"
                             onChange={handleImageChange}
                         />
