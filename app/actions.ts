@@ -62,12 +62,14 @@ export async function analyzeWineImage(formData: FormData): Promise<{ name: stri
                 },
                 {
                     type: "text",
-                    text: `Analyze this photo. If it is not a wine, beer, cider, or champagne bottle or label, or if you cannot identify the drink, return exactly:
-{"name": "", "description": ""}
+                    text: `Analyze this photo. If it is not an alcoholic beverage bottle or label, or if you cannot identify the drink, return exactly:
+{"brand_name": "", "alcohol_name": "", "year": "", "description": ""}
 
-If you can identify the drink (wine, beer, cider, or champagne), return ONLY a JSON object with exactly these two fields:
+If you can identify the drink, return ONLY a JSON object with exactly these four fields:
 {
-  "name": "producer/brewery/winery, drink name, and vintage year or batch if visible",
+  "brand_name": "the producer, winery, or brewery name if visible, otherwise empty string",
+  "alcohol_name": "the name or style of the drink (e.g. Cabernet Sauvignon, IPA, Champagne Brut) if applicable, otherwise empty string",
+  "year": "the vintage year or batch year if visible, otherwise empty string",
   "description": "one sentence tasting note covering the key flavours and a food pairing"
 }
 No other text before or after the JSON. ${langInstruction}`,
@@ -79,7 +81,14 @@ No other text before or after the JSON. ${langInstruction}`,
     const text = response.content[0].type === "text" ? response.content[0].text : "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("No JSON found in Claude response");
-    return JSON.parse(match[0]) as { name: string; description: string };
+    const { brand_name, alcohol_name, year, description } = JSON.parse(match[0]) as {
+        brand_name: string;
+        alcohol_name: string;
+        year: string;
+        description: string;
+    };
+    const name = [brand_name, alcohol_name, year].filter(Boolean).join(" ");
+    return { name, description };
 }
 
 export async function addWine(formData: FormData) {
