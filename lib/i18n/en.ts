@@ -62,8 +62,6 @@ export const en = {
     descriptionLabel: "Description",
     descriptionPlaceholder: "Tasting notes, vintage, etc.",
     ratingLabel: "Rating",
-    notesLabel: "Personal Notes",
-    notesPlaceholder: "Your own thoughts, food pairings, occasion...",
     saving: "Adding Wine...",
     save: "Save to Collection",
     ratingRequired: "Please select a rating",
@@ -75,7 +73,6 @@ export const en = {
   },
   wineModal: {
     tastingNotes: "Tasting Notes",
-    personalNotes: "Personal Notes",
     deleteConfirm: "Delete this wine?",
     deleteConfirmAction: "Yes, delete",
     deleting: "Deleting…",
