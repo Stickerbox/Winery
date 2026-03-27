@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Camera } from "lucide-react";
+import { Camera, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -31,6 +31,7 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
     const [name, setName] = React.useState(initialValues?.name ?? "");
     const [description, setDescription] = React.useState(initialValues?.description ?? "");
     const [notes, setNotes] = React.useState("");
+    const [isDescriptionOpen, setIsDescriptionOpen] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
     const { t } = useTranslations();
@@ -181,15 +182,36 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium leading-none">{t.wineForm.descriptionLabel}</label>
-                                    <Textarea
-                                        name="description"
-                                        placeholder={t.wineForm.descriptionPlaceholder}
-                                        className="min-h-[60px]"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        required
-                                    />
+                                    <button
+                                        type="button"
+                                        className="flex items-center justify-between w-full text-sm font-medium leading-none"
+                                        onClick={() => setIsDescriptionOpen((o) => !o)}
+                                    >
+                                        {t.wineForm.descriptionLabel}
+                                        {isDescriptionOpen
+                                            ? <ChevronDown className="h-4 w-4 text-zinc-400" />
+                                            : <ChevronRight className="h-4 w-4 text-zinc-400" />
+                                        }
+                                    </button>
+                                    <AnimatePresence initial={false}>
+                                        {isDescriptionOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                style={{ overflow: "hidden" }}
+                                            >
+                                                <Textarea
+                                                    name="description"
+                                                    placeholder={t.wineForm.descriptionPlaceholder}
+                                                    className="min-h-[60px]"
+                                                    value={description}
+                                                    onChange={(e) => setDescription(e.target.value)}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
 
                                 {mode !== "wishlist" && (
