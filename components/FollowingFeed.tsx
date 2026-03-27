@@ -15,9 +15,10 @@ type FeedWine = Wine & { user: { username: string } };
 interface FollowingFeedProps {
     wines: FeedWine[];
     wishlistItems: WishlistItem[];
+    searchQuery?: string;
 }
 
-export function FollowingFeed({ wines, wishlistItems }: FollowingFeedProps) {
+export function FollowingFeed({ wines, wishlistItems, searchQuery = "" }: FollowingFeedProps) {
     const [selectedWine, setSelectedWine] = React.useState<FeedWine | null>(null);
     const [localWishlistItems, setLocalWishlistItems] = React.useState<WishlistItem[]>(wishlistItems);
     const { t, lang } = useTranslations();
@@ -79,7 +80,14 @@ export function FollowingFeed({ wines, wishlistItems }: FollowingFeedProps) {
         );
     }
 
-    const groups = groupWinesByMonth(wines, lang);
+    const filteredWines = searchQuery.trim()
+        ? wines.filter((w) =>
+              w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              w.description.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : wines;
+
+    const groups = groupWinesByMonth(filteredWines, lang);
 
     return (
         <>

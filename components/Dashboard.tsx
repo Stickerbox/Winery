@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Search, Wine as WineIcon, Users, Bookmark, Share2 } from "lucide-react";
+import { Plus, X, LogOut, Wine as WineIcon, Users, Bookmark, Share2 } from "lucide-react";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
@@ -37,12 +37,17 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
     const [isPickerOpen, setIsPickerOpen] = React.useState(false);
     const [addMode, setAddMode] = React.useState<"collection" | "wishlist" | null>(null);
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
-    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
     const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "rating-high" | "rating-low">("newest");
     const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist">("collection");
-    const searchInputRef = React.useRef<HTMLInputElement>(null);
     const { t } = useTranslations();
+
+    const tabCount = activeTab === "collection" ? wines.length : activeTab === "following" ? feedWines.length : wishlistItems.length;
+    const showSearch = tabCount > 4;
+
+    React.useEffect(() => {
+        setSearchQuery("");
+    }, [activeTab]);
 
     React.useEffect(() => {
         if (!isPickerOpen) return;
@@ -81,16 +86,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
         return result;
     }, [wines, searchQuery, sortBy]);
 
-    const handleSearchToggle = () => {
-        if (isSearchOpen) {
-            setIsSearchOpen(false);
-            setSearchQuery("");
-        } else {
-            setIsSearchOpen(true);
-            setTimeout(() => searchInputRef.current?.focus(), 50);
-        }
-    };
-
     const selectedIndex = React.useMemo(
         () => (selectedWine ? filteredWines.findIndex((w) => w.id === selectedWine.id) : -1),
         [filteredWines, selectedWine]
@@ -119,15 +114,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             <option value="rating-high">{t.dashboard.sortRatingHigh}</option>
                             <option value="rating-low">{t.dashboard.sortRatingLow}</option>
                         </select>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={handleSearchToggle}
-                            title={t.dashboard.searchTitle}
-                        >
-                            {isSearchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
-                        </Button>
                         <form action={logout}>
                             <Button variant="ghost" size="icon" className="rounded-full" title={t.dashboard.logoutTitle}>
                                 <LogOut className="h-4 w-4" />
@@ -136,7 +122,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                     </div>
                 </div>
                 <AnimatePresence>
-                    {isSearchOpen && (
+                    {showSearch && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
@@ -145,7 +131,6 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                             className="overflow-hidden"
                         >
                             <input
-                                ref={searchInputRef}
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -194,8 +179,8 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                         onWineClick={(wine) => setSelectedWine(wine)}
                     />
                 )}
-                {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistItems={wishlistItems} />}
-                {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} />}
+                {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistItems={wishlistItems} searchQuery={searchQuery} />}
+                {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} searchQuery={searchQuery} />}
             </main>
 
             {/* Add Picker Popup */}

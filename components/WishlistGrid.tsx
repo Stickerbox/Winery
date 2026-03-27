@@ -13,9 +13,10 @@ import { useTranslations } from "@/components/LanguageContext";
 
 interface WishlistGridProps {
     items: WishlistItem[];
+    searchQuery?: string;
 }
 
-export function WishlistGrid({ items }: WishlistGridProps) {
+export function WishlistGrid({ items, searchQuery = "" }: WishlistGridProps) {
     const [movingItem, setMovingItem] = React.useState<WishlistItem | null>(null);
     const [selectedItem, setSelectedItem] = React.useState<WishlistItem | null>(null);
     const movingItemRef = React.useRef<WishlistItem | null>(null);
@@ -24,6 +25,13 @@ export function WishlistGrid({ items }: WishlistGridProps) {
     React.useEffect(() => {
         movingItemRef.current = movingItem;
     }, [movingItem]);
+
+    const filteredItems = searchQuery.trim()
+        ? items.filter((i) =>
+              i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              i.description.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : items;
 
     if (items.length === 0) {
         return (
@@ -36,7 +44,7 @@ export function WishlistGrid({ items }: WishlistGridProps) {
     return (
         <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                {items.map((item) => (
+                {filteredItems.map((item) => (
                     <div key={item.id} className="flex flex-col">
                         <WineCard
                             wine={item}
