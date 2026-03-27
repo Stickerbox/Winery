@@ -30,7 +30,6 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
     const [imagePreview, setImagePreview] = React.useState<string | null>(null);
     const [name, setName] = React.useState(initialValues?.name ?? "");
     const [description, setDescription] = React.useState(initialValues?.description ?? "");
-    const [notes, setNotes] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const compressedFileRef = React.useRef<File | null>(null);
     const { t } = useTranslations();
@@ -105,7 +104,6 @@ export function WineForm({ onSuccess, initialValues, skipAnalysis, onSubmit, mod
                 setImagePreview(null);
                 setName(initialValues?.name ?? "");
                 setDescription(initialValues?.description ?? "");
-                setNotes("");
                 setPhase(initialValues ? "review" : "capture");
                 compressedFileRef.current = null;
                 if (fileInputRef.current) fileInputRef.current.value = "";
