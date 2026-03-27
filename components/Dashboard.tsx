@@ -270,6 +270,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                     <WineModal
                         wine={selectedWine}
                         onClose={() => setSelectedWine(null)}
+                        onUpdate={(updatedWine) => setSelectedWine(updatedWine)}
                         hasPrev={selectedIndex > 0}
                         hasNext={selectedIndex !== -1 && selectedIndex < filteredWines.length - 1}
                         onPrev={() => setSelectedWine(filteredWines[selectedIndex - 1])}
