@@ -33,7 +33,7 @@ export function RatingStar({
                     "empty";
 
                 return (
-                    <div key={index} className="relative h-6 w-6">
+                    <div key={index} className="relative">
                         {/* Background empty star */}
                         <Star className="h-6 w-6 fill-transparent text-zinc-300 dark:text-zinc-600" />
                         {/* Filled overlay — clipped to left 50% for half, full width for full */}
@@ -50,17 +50,19 @@ export function RatingStar({
                             <>
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 left-0 w-1/2 cursor-pointer focus:outline-none"
+                                    className="absolute inset-y-0 left-0 w-1/2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
                                     onMouseEnter={() => setHoverRating(halfValue)}
                                     onMouseLeave={() => setHoverRating(null)}
                                     onClick={() => onRatingChange?.(halfValue)}
+                                    aria-label={`Rate ${halfValue} out of ${maxRating}`}
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 w-1/2 cursor-pointer focus:outline-none"
+                                    className="absolute inset-y-0 right-0 w-1/2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
                                     onMouseEnter={() => setHoverRating(fullValue)}
                                     onMouseLeave={() => setHoverRating(null)}
                                     onClick={() => onRatingChange?.(fullValue)}
+                                    aria-label={`Rate ${fullValue} out of ${maxRating}`}
                                 />
                             </>
                         )}
