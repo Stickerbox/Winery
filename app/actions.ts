@@ -97,7 +97,7 @@ export async function addWine(formData: FormData) {
 
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const rating = parseInt(formData.get("rating") as string);
+    const rating = parseFloat(formData.get("rating") as string);
     const image = formData.get("image") as File;
 
     if (!name || !description || !rating || !image) {
@@ -341,7 +341,7 @@ export async function moveToCollection(itemId: number, formData: FormData) {
 
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const rating = parseInt(formData.get("rating") as string);
+    const rating = parseFloat(formData.get("rating") as string);
     const image = formData.get("image") as File;
 
     if (!name || !description || !rating || !image) {
