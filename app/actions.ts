@@ -98,6 +98,7 @@ export async function addWine(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const rating = parseFloat(formData.get("rating") as string);
+    const notes = (formData.get("notes") as string) || null;
     const image = formData.get("image") as File;
 
     if (!name || !description || !rating || !image) {
@@ -112,6 +113,7 @@ export async function addWine(formData: FormData) {
                 name,
                 description,
                 rating,
+                notes,
                 imagePath,
                 userId: user.id,
             },
@@ -342,6 +344,7 @@ export async function moveToCollection(itemId: number, formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const rating = parseFloat(formData.get("rating") as string);
+    const notes = (formData.get("notes") as string) || null;
     const image = formData.get("image") as File;
 
     if (!name || !description || !rating || !image) {
@@ -355,7 +358,7 @@ export async function moveToCollection(itemId: number, formData: FormData) {
 
         await prisma.$transaction([
             prisma.wine.create({
-                data: { name, description, rating, imagePath, userId: currentUser.id },
+                data: { name, description, rating, notes, imagePath, userId: currentUser.id },
             }),
             prisma.wishlistItem.delete({ where: { id: itemId } }),
         ]);
@@ -387,7 +390,7 @@ export async function getFollowingFeed() {
 
 export async function updateWine(
     id: number,
-    data: { name: string; description: string; rating: number }
+    data: { name: string; description: string; rating: number; notes: string | null }
 ): Promise<Wine> {
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
@@ -397,7 +400,7 @@ export async function updateWine(
 
     const updated = await prisma.wine.update({
         where: { id },
-        data: { name: data.name, description: data.description, rating: data.rating },
+        data: { name: data.name, description: data.description, rating: data.rating, notes: data.notes },
     });
     revalidatePath("/");
     return updated;

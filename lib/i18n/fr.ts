@@ -64,6 +64,8 @@ export const fr = {
     descriptionLabel: "Description",
     descriptionPlaceholder: "Notes de dégustation, millésime, etc.",
     ratingLabel: "Note",
+    notesLabel: "Notes personnelles",
+    notesPlaceholder: "Vos impressions, accords mets-vins, occasion...",
     saving: "Ajout en cours...",
     save: "Sauvegarder dans la collection",
     ratingRequired: "Veuillez sélectionner une note",
@@ -75,6 +77,7 @@ export const fr = {
   },
   wineModal: {
     tastingNotes: "Notes de dégustation",
+    personalNotes: "Notes personnelles",
     deleteConfirm: "Supprimer ce vin ?",
     deleteConfirmAction: "Oui, supprimer",
     deleting: "Suppression…",

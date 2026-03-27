@@ -48,6 +48,7 @@ export function WineModal({
     const [editName, setEditName] = React.useState(wine.name);
     const [editDescription, setEditDescription] = React.useState(wine.description);
     const [editRating, setEditRating] = React.useState(wine.rating);
+    const [editNotes, setEditNotes] = React.useState(wine.notes ?? "");
     const [isSaving, setIsSaving] = React.useState(false);
     const [saveError, setSaveError] = React.useState<string | null>(null);
     const { t, lang } = useTranslations();
@@ -68,6 +69,7 @@ export function WineModal({
         setEditName(wine.name);
         setEditDescription(wine.description);
         setEditRating(wine.rating);
+        setEditNotes(wine.notes ?? "");
     }, [wine.id]);
 
     const saqUrl = `https://www.saq.com/${lang}/catalogsearch/result/?q=${encodeURIComponent(wine.name)}&catalog_type=1&availability_front=Online&availability_front=In%20store`;
@@ -119,6 +121,7 @@ export function WineModal({
         setEditName(wine.name);
         setEditDescription(wine.description);
         setEditRating(wine.rating);
+        setEditNotes(wine.notes ?? "");
         setSaveError(null);
         setIsEditing(true);
     }
@@ -131,6 +134,7 @@ export function WineModal({
                 name: editName,
                 description: editDescription,
                 rating: editRating,
+                notes: editNotes.trim() || null,
             });
             setIsEditing(false);
             onUpdate?.(updated);
@@ -316,6 +320,26 @@ export function WineModal({
                                 </p>
                             )}
                         </div>
+
+                        {(isEditing || wine.notes) && (
+                            <div className="mt-6">
+                                <h3 className="text-sm font-medium text-zinc-500 dark:text-white/50 uppercase tracking-wider mb-3">
+                                    {t.wineModal.personalNotes}
+                                </h3>
+                                {isEditing ? (
+                                    <Textarea
+                                        value={editNotes}
+                                        onChange={(e) => setEditNotes(e.target.value)}
+                                        placeholder={t.wineForm.notesPlaceholder}
+                                        className="min-h-[80px]"
+                                    />
+                                ) : (
+                                    <p className="text-zinc-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
+                                        {wine.notes}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         {!readonly && (
                             <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/15">
