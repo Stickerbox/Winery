@@ -1,6 +1,7 @@
 "use server";
 
-import { PrismaClient, Prisma, Wine } from "@prisma/client";
+import { Prisma, Wine } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -10,8 +11,6 @@ import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 import Anthropic from "@anthropic-ai/sdk";
 import { detectServerLang } from "@/lib/i18n";
-
-const prisma = new PrismaClient();
 
 import { getCurrentUser } from "./auth-actions";
 
