@@ -2,11 +2,13 @@
 
 ## Auth
 
-Cookie-based sessions, no passwords. Users log in by username only — account is auto-created on first login.
+Passkey-based sessions (WebAuthn). Users log in by username — if new, prompted to create a passkey; if returning, prompted to authenticate with their existing passkey.
 
-- `auth-actions.ts` — `login()`, `logout()`, `getCurrentUser()`
-- Sets an HTTP-only `userId` cookie with 7-day expiry
+- `auth-actions.ts` — `logout()`, `getCurrentUser()`, `getPasskeys()`, `removePasskey(id)`
+- Sets an HTTP-only `userId` cookie with 7-day expiry after successful passkey verification
 - `getCurrentUser()` is called from server components and actions to guard all protected routes
+- WebAuthn handshake uses four API routes under `app/api/auth/` (register/options, register/verify, authenticate/options, authenticate/verify) plus `app/api/auth/passkeys/add/options` for adding passkeys to existing accounts
+- Challenges are stored in a short-lived `webauthn-challenge` httpOnly cookie (5-minute TTL)
 
 ## Routes
 

@@ -47,6 +47,10 @@ The app runs on an **AWS EC2 Ubuntu** instance via `npm run start` (production b
 ```
 DATABASE_URL=file:./dev.db      # SQLite DB path
 ANTHROPIC_API_KEY=...           # Required for AI wine label analysis (installed on the server)
+RP_ID=jadorele.vin              # WebAuthn relying party ID (domain only, no protocol)
+ORIGIN=https://jadorele.vin     # WebAuthn expected origin (full URL with protocol)
 ```
 
 `ANTHROPIC_API_KEY` must be set on the server — the AI image analysis feature will fail without it.
+
+In development, set in `.env.local`: `RP_ID=localhost` and `ORIGIN=http://localhost:3000`
