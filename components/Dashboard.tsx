@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Wine as WineIcon, Users, Bookmark, Share2 } from "lucide-react";
+import { Plus, X, LogOut, Wine as WineIcon, Users, Bookmark, Share2, KeyRound } from "lucide-react";
+import { PasskeyManager } from "@/components/PasskeyManager";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
 import { WineForm } from "@/components/WineForm";
@@ -22,6 +23,7 @@ interface DashboardProps {
     user: User;
     feedWines: FeedWine[];
     wishlistItems: WishlistItem[];
+    passkeys: { id: string; transports: string | null; createdAt: Date }[];
 }
 
 const PickerPill = ({ emoji, label, onClick }: { emoji: string; label: string; onClick: () => void }) => (
@@ -33,16 +35,16 @@ const PickerPill = ({ emoji, label, onClick }: { emoji: string; label: string; o
     </button>
 );
 
-export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardProps) {
+export function Dashboard({ wines, user, feedWines, wishlistItems, passkeys }: DashboardProps) {
     const [isPickerOpen, setIsPickerOpen] = React.useState(false);
     const [addMode, setAddMode] = React.useState<"collection" | "wishlist" | null>(null);
     const [selectedWine, setSelectedWine] = React.useState<Wine | null>(null);
     const [searchQuery, setSearchQuery] = React.useState("");
     const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "rating-high" | "rating-low">("newest");
-    const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist">("collection");
+    const [activeTab, setActiveTab] = React.useState<"collection" | "following" | "wishlist" | "security">("collection");
     const { t } = useTranslations();
 
-    const tabCount = activeTab === "collection" ? wines.length : activeTab === "following" ? feedWines.length : wishlistItems.length;
+    const tabCount = activeTab === "collection" ? wines.length : activeTab === "following" ? feedWines.length : activeTab === "wishlist" ? wishlistItems.length : passkeys.length;
     const showSearch = tabCount > 4;
 
     React.useEffect(() => {
@@ -144,7 +146,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
 
             <main className="container mx-auto max-w-7xl">
                 <div className="hidden sm:flex items-center border-b border-white/20 dark:border-white/15 px-4">
-                    {(["collection", "following", "wishlist"] as const).map((tab) => (
+                    {(["collection", "following", "wishlist", "security"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -160,7 +162,9 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                                 ? t.dashboard.tabCollection
                                 : tab === "following"
                                 ? t.dashboard.tabFollowing
-                                : t.dashboard.tabWishlist}
+                                : tab === "wishlist"
+                                ? t.dashboard.tabWishlist
+                                : t.security.title}
                         </button>
                     ))}
                     <button
@@ -181,6 +185,11 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                 )}
                 {activeTab === "following" && <FollowingFeed wines={feedWines} wishlistItems={wishlistItems} searchQuery={searchQuery} />}
                 {activeTab === "wishlist" && <WishlistGrid items={wishlistItems} searchQuery={searchQuery} />}
+                {activeTab === "security" && (
+                    <div className="p-4 max-w-md mx-auto">
+                        <PasskeyManager passkeys={passkeys} username={user.username} />
+                    </div>
+                )}
             </main>
 
             {/* Add Picker Popup */}
@@ -281,7 +290,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
 
             {/* Mobile Bottom Nav */}
             <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-20 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-full shadow-[var(--glass-shadow)] h-14 overflow-hidden">
-                {(["collection", "following", "wishlist"] as const).map((tab) => (
+                {(["collection", "following", "wishlist", "security"] as const).map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -296,12 +305,15 @@ export function Dashboard({ wines, user, feedWines, wishlistItems }: DashboardPr
                         {tab === "collection" && <WineIcon className="h-5 w-5" aria-hidden="true" />}
                         {tab === "following" && <Users className="h-5 w-5" aria-hidden="true" />}
                         {tab === "wishlist" && <Bookmark className="h-5 w-5" aria-hidden="true" />}
+                        {tab === "security" && <KeyRound className="h-5 w-5" aria-hidden="true" />}
                         <span>
                             {tab === "collection"
                                 ? t.dashboard.tabCollection
                                 : tab === "following"
                                 ? t.dashboard.tabFollowing
-                                : t.dashboard.tabWishlist}
+                                : tab === "wishlist"
+                                ? t.dashboard.tabWishlist
+                                : t.security.title}
                         </span>
                     </button>
                 ))}
