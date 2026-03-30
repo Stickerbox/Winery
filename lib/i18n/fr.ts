@@ -21,7 +21,7 @@ export const fr = {
     shareTitle: "Partager le profil",
     tabCollection: "Collection",
     tabFollowing: "Abonnements",
-    tabWishlist: "Liste de souhaits",
+    tabWishlist: "Envies",
     addToCollection: "Ajouter à la collection",
     addToWishlist: "Ajouter à la liste de souhaits",
   },
