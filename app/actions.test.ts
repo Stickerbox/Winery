@@ -1,7 +1,4 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { mockReset } from 'vitest-mock-extended';
-import type { DeepMockProxy } from 'vitest-mock-extended';
-import type { PrismaClient } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
 // vi.mock calls are hoisted to the top of the file by Vitest before any imports run.
@@ -24,7 +21,7 @@ import {
   addToWishlist,
 } from './actions';
 
-const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
+const prismaMock = prisma as any;
 const getCurrentUserMock = getCurrentUser as ReturnType<typeof vi.fn>;
 
 // Shared fixtures
@@ -43,7 +40,6 @@ const mockWine = {
 };
 
 beforeEach(() => {
-  mockReset(prismaMock);
   vi.resetAllMocks();
   getCurrentUserMock.mockResolvedValue(null); // default: not authenticated
 });
