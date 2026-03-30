@@ -83,7 +83,7 @@ describe('POST /api/auth/register/options', () => {
     expect(mockCookieStore.set).toHaveBeenCalledWith(
       'webauthn-challenge',
       'abc123',
-      expect.objectContaining({ httpOnly: true, maxAge: 300 })
+      expect.objectContaining({ httpOnly: true, maxAge: 300, path: '/' })
     );
   });
 });
