@@ -87,3 +87,122 @@ describe('POST /api/auth/register/options', () => {
     );
   });
 });
+
+import { verifyRegistrationResponse } from '@simplewebauthn/server';
+import { POST as registerVerify } from './verify/route';
+
+function makeVerifyRequest(body: unknown) {
+  return new Request('http://localhost/api/auth/register/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+const mockCredential = {
+  id: 'cred-id-base64url',
+  rawId: 'cred-id-base64url',
+  response: {
+    clientDataJSON: 'abc',
+    attestationObject: 'def',
+    transports: ['internal'],
+  },
+  type: 'public-key',
+  clientExtensionResults: {},
+};
+
+describe('POST /api/auth/register/verify', () => {
+  it('returns 400 when no challenge cookie is present', async () => {
+    mockCookieStore.get.mockReturnValue(undefined);
+
+    const res = await registerVerify(
+      makeVerifyRequest({ username: 'alice', credential: mockCredential })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when verification fails', async () => {
+    mockCookieStore.get.mockReturnValue({ value: 'stored-challenge' });
+    vi.mocked(verifyRegistrationResponse).mockResolvedValue({
+      verified: false,
+    } as any);
+
+    const res = await registerVerify(
+      makeVerifyRequest({ username: 'alice', credential: mockCredential })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('creates User and Credential on success and sets session cookie', async () => {
+    mockCookieStore.get.mockReturnValue({ value: 'stored-challenge' });
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    prismaMock.user.create.mockResolvedValue({
+      id: 1,
+      username: 'alice',
+      createdAt: new Date(),
+    } as any);
+    prismaMock.credential.create.mockResolvedValue({} as any);
+    vi.mocked(verifyRegistrationResponse).mockResolvedValue({
+      verified: true,
+      registrationInfo: {
+        credential: {
+          id: 'cred-id-base64url',
+          publicKey: new Uint8Array([1, 2, 3]),
+          counter: 0,
+        },
+      },
+    } as any);
+
+    const res = await registerVerify(
+      makeVerifyRequest({ username: 'alice', credential: mockCredential })
+    );
+
+    expect(res.status).toBe(200);
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: { username: 'alice' },
+    });
+    expect(prismaMock.credential.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        userId: 1,
+        credentialId: 'cred-id-base64url',
+        counter: 0,
+      }),
+    });
+    expect(mockCookieStore.set).toHaveBeenCalledWith(
+      'userId',
+      '1',
+      expect.objectContaining({ httpOnly: true })
+    );
+    expect(mockCookieStore.delete).toHaveBeenCalledWith('webauthn-challenge');
+  });
+
+  it('uses existing user instead of creating a new one when username already exists', async () => {
+    mockCookieStore.get.mockReturnValue({ value: 'stored-challenge' });
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 5,
+      username: 'alice',
+      createdAt: new Date(),
+    } as any);
+    prismaMock.credential.create.mockResolvedValue({} as any);
+    vi.mocked(verifyRegistrationResponse).mockResolvedValue({
+      verified: true,
+      registrationInfo: {
+        credential: {
+          id: 'new-cred',
+          publicKey: new Uint8Array([1, 2, 3]),
+          counter: 0,
+        },
+      },
+    } as any);
+
+    const res = await registerVerify(
+      makeVerifyRequest({ username: 'alice', credential: mockCredential })
+    );
+
+    expect(res.status).toBe(200);
+    expect(prismaMock.user.create).not.toHaveBeenCalled();
+    expect(prismaMock.credential.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ userId: 5 }),
+    });
+  });
+});
