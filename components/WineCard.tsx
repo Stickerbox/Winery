@@ -20,7 +20,7 @@ interface WineCardProps {
     hideRating?: boolean;
 }
 
-export function WineCard({ wine, onClick, readonly, hideRating }: WineCardProps) {
+export function WineCard({ wine, onClick, hideRating }: WineCardProps) {
     return (
         <motion.div
             layoutId={`wine-${wine.id}`}
