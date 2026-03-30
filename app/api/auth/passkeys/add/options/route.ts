@@ -21,7 +21,6 @@ export async function POST() {
     rpName: 'VinoVault',
     rpID,
     userName: user.username,
-    attestation: 'none',
     authenticatorSelection: {
       residentKey: 'preferred',
       userVerification: 'preferred',

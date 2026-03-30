@@ -21,7 +21,7 @@ interface PasskeyManagerProps {
 }
 
 export function PasskeyManager({ passkeys: initial, username }: PasskeyManagerProps) {
-  const t = useTranslations();
+  const { t } = useTranslations();
   const [passkeys, setPasskeys] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [addStatus, setAddStatus] = useState<string | null>(null);
