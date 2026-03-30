@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  createdAt DateTime @default(now())
-  wines     Wine[]
-  following Follow[] @relation("UserFollowers")
-  followers Follow[] @relation("UserFollowing")
-  wishlist  WishlistItem[]
+  id          Int          @id @default(autoincrement())
+  username    String       @unique
+  createdAt   DateTime     @default(now())
+  wines       Wine[]
+  following   Follow[]     @relation("UserFollowers")
+  followers   Follow[]     @relation("UserFollowing")
+  wishlist    WishlistItem[]
+  credentials Credential[]
 }
 
 model Wine {
@@ -56,4 +57,15 @@ model WishlistItem {
   createdAt       DateTime @default(now())
 
   @@unique([userId, name, addedByUsername])
+}
+
+model Credential {
+  id           String   @id @default(cuid())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  credentialId String   @unique
+  publicKey    String
+  counter      Int
+  transports   String?
+  createdAt    DateTime @default(now())
 }

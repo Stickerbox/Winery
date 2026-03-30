@@ -15,8 +15,17 @@ export const prisma = {
   },
   user: {
     findUnique: vi.fn(),
+    create: vi.fn(),
   },
   wishlistItem: {
     create: vi.fn(),
+  },
+  credential: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
   },
 };
