@@ -165,7 +165,7 @@ describe('addSharedWine', () => {
       userId: mockUser.id,
       shareToken: 'token',
       user: { id: mockUser.id, username: 'alice', createdAt: new Date() },
-    });
+    } as any);
     await expect(addSharedWine('token')).rejects.toThrow('Already in your collection');
   });
 
@@ -179,7 +179,7 @@ describe('addSharedWine', () => {
       userId: otherUser.id,
       shareToken: 'token',
       user: otherUser,
-    });
+    } as any);
     prismaMock.wine.create.mockResolvedValue({ ...mockWine, id: 6 });
 
     await addSharedWine('token');
