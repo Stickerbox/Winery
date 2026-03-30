@@ -4,35 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function login(redirectTo: string = "/", formData: FormData) {
-    const username = formData.get("username") as string;
-
-    if (!username || username.trim().length === 0) {
-        throw new Error("Username is required");
-    }
-
-    // Find or create user
-    let user = await prisma.user.findUnique({
-        where: { username },
-    });
-
-    if (!user) {
-        user = await prisma.user.create({
-            data: { username },
-        });
-    }
-
-    // Set cookie
-    (await cookies()).set("userId", user.id.toString(), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7, // 1 week
-        path: "/",
-    });
-
-    redirect(redirectTo);
-}
-
 export async function logout() {
     (await cookies()).delete("userId");
     redirect("/login");
@@ -48,4 +19,26 @@ export async function getCurrentUser() {
     });
 
     return user;
+}
+
+export async function getPasskeys() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+
+    return prisma.credential.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'asc' },
+    });
+}
+
+export async function removePasskey(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const count = await prisma.credential.count({ where: { userId: user.id } });
+    if (count <= 1) throw new Error("Cannot remove your only passkey");
+
+    await prisma.credential.delete({
+        where: { id, userId: user.id },
+    });
 }
