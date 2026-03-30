@@ -103,10 +103,53 @@ A "Security" section added to the dashboard (the existing `/` route), below the 
 
 ## 6. Testing
 
-- Unit tests for the verify route handlers (mock SimpleWebAuthn verify functions)
-- Integration-style tests for the Prisma credential creation/lookup
-- Manual browser testing for the full registration and authentication flows
-- Test multiple passkeys: register two, remove one, confirm the other still works
+Tests live alongside their subjects and follow the existing Vitest + hand-rolled Prisma mock pattern (no `vitest-mock-extended`). SimpleWebAuthn server functions (`verifyRegistrationResponse`, `verifyAuthenticationResponse`, `generateRegistrationOptions`, `generateAuthenticationOptions`) are mocked with `vi.mock('@simplewebauthn/server')`. Next.js `cookies()` and `headers()` are mocked as needed.
+
+### `app/api/auth/register/route.test.ts`
+
+**`/options` handler:**
+- Returns 400 if `username` is missing from request body
+- Returns 409 if the user already has credentials in the DB
+- Returns 200 with registration options for a new username (no existing user)
+- Stores the challenge in the `webauthn-challenge` cookie
+
+**`/verify` handler:**
+- Returns 400 if the `webauthn-challenge` cookie is missing
+- Returns 400 if `verifyRegistrationResponse` returns `{ verified: false }`
+- Creates a `User` and a `Credential` record on success
+- Sets the `userId` session cookie on success
+- Deletes the `webauthn-challenge` cookie on success
+
+### `app/api/auth/authenticate/route.test.ts`
+
+**`/options` handler:**
+- Returns 404 if username doesn't match any user
+- Returns 404 if user exists but has no credentials
+- Returns 200 with authentication options including the user's credential IDs
+
+**`/verify` handler:**
+- Returns 400 if the `webauthn-challenge` cookie is missing
+- Returns 400 if `verifyAuthenticationResponse` returns `{ verified: false }`
+- Updates the credential `counter` on success
+- Sets the `userId` session cookie on success
+- Deletes the `webauthn-challenge` cookie on success
+
+### `app/api/auth/passkeys/add/route.test.ts`
+
+**`/options` handler:**
+- Returns 401 if no active session (`userId` cookie absent)
+- Returns 200 with registration options for an authenticated user who already has credentials (no 409)
+
+### `app/auth-actions.test.ts` (additions to existing file)
+
+**`getPasskeys()`:**
+- Returns empty array when not authenticated
+- Returns the current user's credentials when authenticated
+
+**`removePasskey(id)`:**
+- Throws `Unauthorized` when not authenticated
+- Throws an error when the user only has one credential (last passkey guard)
+- Deletes the credential when the user has multiple
 
 ---
 
