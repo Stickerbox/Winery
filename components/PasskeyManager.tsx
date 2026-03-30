@@ -44,9 +44,11 @@ export function PasskeyManager({ passkeys: initial, username }: PasskeyManagerPr
     let credential;
     try {
       credential = await startRegistration({ optionsJSON: options });
-    } catch {
+    } catch (e: unknown) {
       setAddStatus(null);
-      setError(t.security.passkeyCancelled);
+      const name = e instanceof Error ? e.name : '';
+      const message = e instanceof Error ? e.message : String(e);
+      setError(name === 'NotAllowedError' ? t.security.passkeyCancelled : message);
       return;
     }
 

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Wine, User } from "@prisma/client";
-import { Plus, X, LogOut, Wine as WineIcon, Users, Bookmark, Share2, KeyRound } from "lucide-react";
+import { Plus, X, LogOut, Wine as WineIcon, Users, Bookmark, Share2 } from "lucide-react";
 import { PasskeyManager } from "@/components/PasskeyManager";
 import { WineGrid } from "@/components/WineGrid";
 import { WineModal } from "@/components/WineModal";
@@ -290,7 +290,7 @@ export function Dashboard({ wines, user, feedWines, wishlistItems, passkeys }: D
 
             {/* Mobile Bottom Nav */}
             <nav aria-label="Tab navigation" className="fixed bottom-4 left-4 right-20 z-20 flex sm:hidden items-center bg-white/30 dark:bg-white/10 backdrop-blur-xl border border-white/30 dark:border-white/20 rounded-full shadow-[var(--glass-shadow)] h-14 overflow-hidden">
-                {(["collection", "following", "wishlist", "security"] as const).map((tab) => (
+                {(["collection", "following", "wishlist"] as const).map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -305,15 +305,12 @@ export function Dashboard({ wines, user, feedWines, wishlistItems, passkeys }: D
                         {tab === "collection" && <WineIcon className="h-5 w-5" aria-hidden="true" />}
                         {tab === "following" && <Users className="h-5 w-5" aria-hidden="true" />}
                         {tab === "wishlist" && <Bookmark className="h-5 w-5" aria-hidden="true" />}
-                        {tab === "security" && <KeyRound className="h-5 w-5" aria-hidden="true" />}
                         <span>
                             {tab === "collection"
                                 ? t.dashboard.tabCollection
                                 : tab === "following"
                                 ? t.dashboard.tabFollowing
-                                : tab === "wishlist"
-                                ? t.dashboard.tabWishlist
-                                : t.security.title}
+                                : t.dashboard.tabWishlist}
                         </span>
                     </button>
                 ))}

@@ -49,9 +49,11 @@ export default function LoginPage() {
         let credential;
         try {
             credential = await startRegistration({ optionsJSON: options });
-        } catch {
+        } catch (e: unknown) {
             setStatus(null);
-            setError(t.login.cancelled);
+            const name = e instanceof Error ? e.name : '';
+            const message = e instanceof Error ? e.message : String(e);
+            setError(name === 'NotAllowedError' ? t.login.cancelled : message);
             return;
         }
 
@@ -88,9 +90,11 @@ export default function LoginPage() {
         let credential;
         try {
             credential = await startAuthentication({ optionsJSON: options });
-        } catch {
+        } catch (e: unknown) {
             setStatus(null);
-            setError(t.login.cancelled);
+            const name = e instanceof Error ? e.name : '';
+            const message = e instanceof Error ? e.message : String(e);
+            setError(name === 'NotAllowedError' ? t.login.cancelled : message);
             return;
         }
 
