@@ -1,5 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { Prisma } from '@prisma/client';
+import type { prisma as PrismaMock } from '@/lib/__mocks__/prisma';
 
 // vi.mock calls are hoisted to the top of the file by Vitest before any imports run.
 // This means the mocks are in place before actions.ts is imported and its module-level
@@ -21,7 +22,7 @@ import {
   addToWishlist,
 } from './actions';
 
-const prismaMock = prisma as any;
+const prismaMock = prisma as unknown as typeof PrismaMock;
 const getCurrentUserMock = getCurrentUser as ReturnType<typeof vi.fn>;
 
 // Shared fixtures
@@ -161,7 +162,7 @@ describe('addSharedWine', () => {
       userId: mockUser.id,
       shareToken: 'token',
       user: { id: mockUser.id, username: 'alice', createdAt: new Date() },
-    } as any);
+    });
     await expect(addSharedWine('token')).rejects.toThrow('Already in your collection');
   });
 
@@ -175,7 +176,7 @@ describe('addSharedWine', () => {
       userId: otherUser.id,
       shareToken: 'token',
       user: otherUser,
-    } as any);
+    });
     prismaMock.wine.create.mockResolvedValue({ ...mockWine, id: 6 });
 
     await addSharedWine('token');
